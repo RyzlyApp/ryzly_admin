@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Onest } from "next/font/google";
-import "./globals.css";
-import { Provider } from "./Provider";
+import { Inter } from "next/font/google";
+import "./globals.css"; 
+import { Provider } from "@/provider";
 
-const onest = Onest({
-  variable: "--font-onest",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-});
+}); 
 
 export const metadata: Metadata = {
   title: "Rhyzly",
@@ -22,8 +22,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={onest.className}>
-        <Provider>{children}</Provider>
+      <body
+        className={`${inter.variable} antialiased`}
+      >
+        <Provider>
+          {children}
+        </Provider>
       </body>
     </html>
   );
