@@ -3,6 +3,8 @@ import { useState } from "react";
 import ApprovalsTabs from "@/components/admin/approvals/ApprovalsTabs";
 import PayoutRequestsTable from "@/components/admin/approvals/PayoutRequestsTable";
 import ApprovalsTablePagination from "@/components/admin/approvals/ApprovalsTablePagination";
+import CoachApplicationTable from "@/components/admin/approvals/CoachApplicationTable";
+import ChallengeTable from "@/components/admin/approvals/ChallengeTable";
 
 interface ApprovalRequest {
   id: string;
@@ -134,18 +136,15 @@ export default function AdminApprovals() {
           )}
 
           {activeTab === "Coach Application" && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">
-                Coach Application content will be displayed here
-              </p>
+            <div className="space-y-6">
+              {/* <PayoutRequestsTable requests={mockPayoutRequests} /> */}
+              <CoachApplicationTable requests={mockPayoutRequests} />
             </div>
           )}
 
           {activeTab === "Challenge Application" && (
             <div className="text-center py-12">
-              <p className="text-gray-500">
-                Challenge Application content will be displayed here
-              </p>
+              <ChallengeTable />
             </div>
           )}
         </div>

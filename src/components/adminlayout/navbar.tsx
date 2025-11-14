@@ -1,11 +1,10 @@
 "use client"
-import { RiNotification2Line, RiSearchLine } from "react-icons/ri";
-import { CustomSearch } from "../custom";
+import { RiNotification2Line, RiSearchLine } from "react-icons/ri"; 
 import { useAtom, useSetAtom } from "jotai";
 import { useEffect } from "react";
-import { userActionsAtom, userAtom } from "@/helper/atom/user";
-import { textLimit } from "@/helper/utils/textlimit";
+import { userActionsAtom, userAtom } from "@/helper/atom/user"; 
 import { Avatar } from "@heroui/react";
+import { CustomSearch } from "../custom";
 
 export default function AdminNavbar() {
     const [userState] = useAtom(userAtom);

@@ -1,5 +1,6 @@
 import { Avatar } from "@heroui/react";
 import CustomImage from "@/components/custom/customImage";
+import { useFetchData } from "@/hook/useFetchData";
 
 interface Challenge {
   id: string;
@@ -20,6 +21,10 @@ export default function ChallengesTable({
   challenges,
   onChallengeClick,
 }: ChallengesTableProps) {
+  
+  const { data, isLoading } = useFetchData<any[]>({ name: "challenge", endpoint: "/challenge/status" });
+
+  console.log(data);
   return (
     <div className="overflow-x-auto">
       <table className="w-full">

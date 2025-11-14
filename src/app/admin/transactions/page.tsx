@@ -2,10 +2,10 @@
 
 import React, { useState } from "react";
 import { TransactionTable } from "@/components/admin/transactions/TransactionTable";
-import { TransactionDetailModal } from "@/components/admin/transactions/TransactionDetailModal";
-import { DateRangePicker } from "@/components/custom/DateRangePicker";
+import { TransactionDetailModal } from "@/components/admin/transactions/TransactionDetailModal"; 
 import CustomSelect from "@/components/custom/customSelect";
 import { Formik, Form } from "formik";
+import { DateRangePicker } from "@heroui/react";
 
 // Define Transaction type
 interface Transaction {
@@ -176,14 +176,14 @@ export default function TransactionsPage() {
             }}
           </Formik>
         </div>
-
+{/* 
         <div className="flex items-center">
           <DateRangePicker
             startDate={new Date("2025-01-06")}
             endDate={new Date("2025-01-13")}
             onChange={() => {}}
           />
-        </div>
+        </div> */}
       </div>
 
       <TransactionTable

@@ -1,6 +1,7 @@
 import React from "react";
 import { Avatar } from "@heroui/react";
 import CustomButton from "@/components/custom/customButton";
+import { useFetchData } from "@/hook/useFetchData";
 
 interface User {
   id: string;
@@ -20,6 +21,12 @@ interface UsersTableProps {
 }
 
 const UsersTable: React.FC<UsersTableProps> = ({ users, onUserClick }) => {
+
+
+  const { data, isLoading } = useFetchData<any[]>({ name: "user", endpoint: "/user/admin" });
+
+  console.log(data);
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -122,4 +129,5 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onUserClick }) => {
   );
 };
 
-export default UsersTable;
+export default UsersTable; 
+

@@ -10,6 +10,9 @@ const UsersTableHeader: React.FC<UsersTableHeaderProps> = ({
   sortBy,
   setSortBy,
 }) => {
+
+  
+
   return (
     <div className="p-6 border-b border-gray-200">
       <div className="flex justify-between items-center">
