@@ -29,7 +29,6 @@ export default function AdminLogin() {
           <h1 className="text-2xl font-bold text-center text-gray-900 mb-8">
             Join Rhyzly Admin
           </h1>
-
           {/* Login Form */}
           <form onSubmit={formik.handleSubmit} className=" w-full flex gap-4 flex-col ">
             {/* Email Field */}
