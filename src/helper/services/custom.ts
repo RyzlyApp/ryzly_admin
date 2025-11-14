@@ -39,7 +39,7 @@ export function useAppMutation<TResponse = unknown, TVariables = unknown>({
         color: "danger",
         timeout: 3000,
       });
-      options?.onError?.(error, variables, context);
+      // options?.onError?.(error, variables, context);
     },
     onSuccess: (data, variables, context) => {
       addToast({
@@ -47,7 +47,7 @@ export function useAppMutation<TResponse = unknown, TVariables = unknown>({
         description: successMessage ?? (data.data as { message?: string })?.message ?? "Success",
         color: "success",
       });
-      options?.onSuccess?.(data, variables, context);
+      // options?.onSuccess?.(data, variables, context);
     },
     ...options,
   });

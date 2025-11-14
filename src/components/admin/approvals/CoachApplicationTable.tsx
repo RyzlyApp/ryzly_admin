@@ -1,12 +1,12 @@
 
 import { Avatar } from "@heroui/react";
 import CustomButton from "@/components/custom/customButton";
-import { useFetchData } from "@/hook/useFetchData";
-import { IApplication } from "@/helper/model/application";
+import { useFetchData } from "@/hook/useFetchData"; 
 import { dateFormat } from "@/helper/utils/dateFormat";
 import { LoadingLayout } from "@/components/shared";
 import useApproval from "@/hook/useApproval";
 import { useState } from "react";
+import { IApplicationDetail } from "@/helper/model/application copy";
 
 interface ApprovalRequest {
     id: string;
@@ -29,7 +29,7 @@ export default function CoachApplicationTable({
     const [id, setId] = useState("")
     const [status, setStatus] = useState("")
 
-    const { data = [], isLoading } = useFetchData<IApplication[]>({ name: "application", endpoint: "/application/admin" });
+    const { data = [], isLoading } = useFetchData<IApplicationDetail[]>({ name: "application", endpoint: "/application/admin" });
 
     const { isLoading: loading, approveCoachMutation } = useApproval()
 
