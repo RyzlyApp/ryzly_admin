@@ -24,7 +24,7 @@ export default function LoginForm() {
             placeholder="Confirm your email address"
             label="Confirm your email address"
             name="confirmemail"
-            type="email"
+            type="password"
           />
         </div>
 
