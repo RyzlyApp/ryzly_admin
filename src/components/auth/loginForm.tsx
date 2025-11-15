@@ -32,40 +32,6 @@ export default function LoginForm() {
         <CustomButton isLoading={loginMutation.isPending} variant="primary" fullWidth size="lg" type="submit">
           Log In
         </CustomButton>
-
-        {/* Divider */}
-        {/* <div className="flex w-full justify-center">
-          <p className="text-sm text-gray-500">Or</p>
-        </div> */}
-
-        {/* Social login buttons */}
-        {/* <div className="w-full flex flex-col gap-4">
-          <CustomButton variant="outline" size="lg">
-            <div className="flex gap-2 items-center">
-              <CustomImage
-                src="/images/google.png"
-                alt="Google logo"
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
-              Continue with Google
-            </div>
-          </CustomButton>
-
-          <CustomButton variant="outline" size="lg">
-            <div className="flex gap-2 items-center">
-              <CustomImage
-                src="/images/linkedin.png"
-                alt="LinkedIn logo"
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
-              Continue with LinkedIn
-            </div>
-          </CustomButton>
-        </div> */}
       </form>
     </FormikProvider>
   )
