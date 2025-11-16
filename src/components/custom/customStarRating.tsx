@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useFormikContext, getIn } from "formik"; 
-import { IRating } from "@/helper/model/application copy";
+import { IRating } from "@/helper/model/application";
 
 interface StarRatingProps {
   name: string;

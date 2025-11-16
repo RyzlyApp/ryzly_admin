@@ -6,7 +6,7 @@ import { dateFormat } from "@/helper/utils/dateFormat";
 import { LoadingLayout } from "@/components/shared";
 import useApproval from "@/hook/useApproval";
 import { useState } from "react";
-import { IApplicationDetail } from "@/helper/model/application copy";
+import { IApplicationDetail } from "@/helper/model/application";
 
 interface ApprovalRequest {
     id: string;
