@@ -21,8 +21,6 @@ export default function PayoutRequestsTable({
   requests,
 }: PayoutRequestsTableProps) {
 
-
-
   const { data, isLoading } = useFetchData<any>({ name: "application", endpoint: "/payout/admin" }); 
 
   return (

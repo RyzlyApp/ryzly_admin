@@ -56,7 +56,7 @@ export default function ChallengesTable({
             >
               <td className="py-4 px-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0">
+                  <div className="w-12 h-12 bg-gray-200 rounded-lg ">
                     <CustomImage
                       src={challenge.thumbnail}
                       alt={challenge.title}
