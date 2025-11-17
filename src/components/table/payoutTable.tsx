@@ -8,7 +8,6 @@ export default function PayoutTable() {
 
     const { data, isLoading } = useFetchData<any>({ name: "application", endpoint: "/payout/admin" });
 
-
     return (
         <LoadingLayout loading={isLoading} lenght={data?.item?.lenght} >
             <div className=" w-full flex flex-col gap-6 items-center " >
@@ -23,6 +22,9 @@ export default function PayoutTable() {
                     </TableHeader>
                     <TableBody>
                         <TableRow key="1">
+                            <TableCell>Tony Reichert</TableCell>
+                            <TableCell>CEO</TableCell>
+                            <TableCell>Active</TableCell>
                             <TableCell>Tony Reichert</TableCell>
                             <TableCell>CEO</TableCell>
                             <TableCell>Active</TableCell>
