@@ -25,12 +25,10 @@ const UsersTableHeader: React.FC<UsersTableHeaderProps> = ({
               onChange={(e) => setSortBy(e.target.value)}
               className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="Recent">Recent</option>
-              <option value="Participants">Participants</option>
-              <option value="Creators">Creators</option>
-              <option value="Active">Active</option>
-              <option value="Banned">Banned</option>
-              <option value="Banned">deactivated</option>
+              <option value="all">All</option>
+              <option value="coach">Coach</option>
+              <option value="active">Active</option>
+              <option value="banned">Banned</option>
             </select>
             <RiArrowDownSLine
               className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400"
