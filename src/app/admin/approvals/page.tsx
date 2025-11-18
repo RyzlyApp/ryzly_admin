@@ -1,154 +1,61 @@
 "use client";
-import { useState } from "react";
+import { lazy, Suspense } from "react";
 import ApprovalsTabs from "@/components/admin/approvals/ApprovalsTabs";
-import PayoutRequestsTable from "@/components/admin/approvals/PayoutRequestsTable";
-import ApprovalsTablePagination from "@/components/admin/approvals/ApprovalsTablePagination";
-import CoachApplicationTable from "@/components/admin/approvals/CoachApplicationTable";
-import ChallengeTable from "@/components/admin/approvals/ChallengeTable";
+// import PayoutRequestsTable from "@/components/admin/approvals/PayoutRequestsTable";
+// import ApprovalsTablePagination from "@/components/admin/approvals/ApprovalsTablePagination";
+// import CoachApplicationTable from "@/components/admin/approvals/CoachApplicationTable";
+// import ChallengeTable from "@/components/admin/approvals/ChallengeTable";
+import { useSearchParams } from "next/navigation";
 
-interface ApprovalRequest {
-  id: string;
-  name: string;
-  availableBalance: string;
-  amountRequested: string;
-  date: string;
-  status: "Pending" | "Approved";
-  avatar: string;
-}
+// interface ApprovalRequest {
+//   id: string;
+//   name: string;
+//   availableBalance: string;
+//   amountRequested: string;
+//   date: string;
+//   status: "Pending" | "Approved";
+//   avatar: string;
+// }
 
-const mockPayoutRequests: ApprovalRequest[] = [
-  {
-    id: "1",
-    name: "Albert Flores",
-    availableBalance: "$14,895.00",
-    amountRequested: "$5,000",
-    date: "25 Aug 2025",
-    status: "Pending",
-    avatar: "AF",
-  },
-  {
-    id: "2",
-    name: "Eleanor Pena",
-    availableBalance: "$14,895.00",
-    amountRequested: "$5,000",
-    date: "25 Aug 2025",
-    status: "Pending",
-    avatar: "EP",
-  },
-  {
-    id: "3",
-    name: "Wade Warren",
-    availableBalance: "$14,895.00",
-    amountRequested: "$5,000",
-    date: "25 Aug 2025",
-    status: "Pending",
-    avatar: "WW",
-  },
-  {
-    id: "4",
-    name: "Darrell Steward",
-    availableBalance: "$14,895.00",
-    amountRequested: "$5,000",
-    date: "25 Aug 2025",
-    status: "Pending",
-    avatar: "DS",
-  },
-  {
-    id: "5",
-    name: "Floyd Miles",
-    availableBalance: "$14,895.00",
-    amountRequested: "$5,000",
-    date: "25 Aug 2025",
-    status: "Pending",
-    avatar: "FM",
-  },
-  {
-    id: "6",
-    name: "Devon Lane",
-    availableBalance: "$14,895.00",
-    amountRequested: "$5,000",
-    date: "25 Aug 2025",
-    status: "Pending",
-    avatar: "DL",
-  },
-  {
-    id: "7",
-    name: "Cody Fisher",
-    availableBalance: "$14,895.00",
-    amountRequested: "$5,000",
-    date: "25 Aug 2025",
-    status: "Pending",
-    avatar: "CF",
-  },
-  {
-    id: "8",
-    name: "Bessie Cooper",
-    availableBalance: "$14,895.00",
-    amountRequested: "$5,000",
-    date: "25 Aug 2025",
-    status: "Pending",
-    avatar: "BC",
-  },
-  {
-    id: "9",
-    name: "Jacob Jones",
-    availableBalance: "$14,895.00",
-    amountRequested: "$5,000",
-    date: "25 Aug 2025",
-    status: "Pending",
-    avatar: "JJ",
-  },
-  {
-    id: "10",
-    name: "Arlene McCoy",
-    availableBalance: "$14,895.00",
-    amountRequested: "$5,000",
-    date: "25 Aug 2025",
-    status: "Approved",
-    avatar: "AM",
-  },
-];
 
 export default function AdminApprovals() {
-  const [activeTab, setActiveTab] = useState("Payout Request");
+
+  const query = useSearchParams();
+  const tab = query?.get('tab') as string;
 
   const tabs = [
-    { id: "Payout Request", label: "Payout Request" },
-    { id: "Coach Application", label: "Coach Application" },
-    { id: "Challenge Application", label: "Challenge Application" },
+    { id: "payout", label: "Payout Request" },
+    { id: "coach", label: "Coach Application" },
+    { id: "challenge", label: "Challenge Application" },
   ];
 
+
+  const CoachApproval = lazy(() => import("@/components/table").then(module => ({ default: module.CoachApproval })));
+  const ChallengeApproval = lazy(() => import("@/components/table").then(module => ({ default: module.ChallengeApproval })));
+  const PayoutTable = lazy(() => import("@/components/table").then(module => ({ default: module.PayoutTable })));
+
   return (
-    <div className="space-y-6">
+    <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
       <div className="bg-white rounded-lg shadow-sm">
         <ApprovalsTabs
           tabs={tabs}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
+          activeTab={tab}
         />
 
         <div className="p-6">
-          {activeTab === "Payout Request" && (
-            <div className="space-y-6">
-              <PayoutRequestsTable requests={mockPayoutRequests} />
-              <ApprovalsTablePagination />
-            </div>
+          {tab === "payout" && (
+            <PayoutTable />
           )}
 
-          {activeTab === "Coach Application" && (
-            <div className="space-y-6">
-              {/* <PayoutRequestsTable requests={mockPayoutRequests} /> */}
-              <CoachApplicationTable requests={mockPayoutRequests} />
-            </div>
+          {tab === "coach" && (
+            <CoachApproval />
           )}
 
-          {activeTab === "Challenge Application" && (
-            <div className="text-center py-12">
-              <ChallengeTable />
-            </div>
+          {tab === "challenge" && (
+            <ChallengeApproval />
           )}
         </div>
       </div>
-    </div>
+    </Suspense>
   );
 }

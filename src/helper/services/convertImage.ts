@@ -1,39 +1,35 @@
-"use client"
-// import heic2any from "heic2any";
+import heic2any from "heic2any";
 
 export const convertAndCompressToPng = async (
   file: File,
   maxSizeKB = 800, 
   quality = 0.9,
-  onProgress: (meg: string) => void // 👈 progress callback
+  onProgress?: (msg: string) => void // 👈 progress callback
 ): Promise<File> => {
-  const workingFile = file;
+  let workingFile = file;
 
   onProgress?.("Checking file type...");
 
-  console.log(quality);
-  
-
   // 🔹 Step 1: Convert HEIC → JPEG first
-  // if (
-  //   file.type === "image/heic" ||
-  //   file.type === "image/heif" ||
-  //   file.name.toLowerCase().endsWith(".heic") ||
-  //   file.name.toLowerCase().endsWith(".heif")
-  // ) {
-  //   onProgress?.("Converting HEIC → JPEG...");
-  //   const convertedBlob = (await heic2any({
-  //     blob: file,
-  //     toType: "image/jpeg", // browsers decode JPEG fine
-  //     quality,
-  //   })) as Blob;
+  if (
+    file.type === "image/heic" ||
+    file.type === "image/heif" ||
+    file.name.toLowerCase().endsWith(".heic") ||
+    file.name.toLowerCase().endsWith(".heif")
+  ) {
+    onProgress?.("Converting HEIC → JPEG...");
+    const convertedBlob = (await heic2any({
+      blob: file,
+      toType: "image/jpeg", // browsers decode JPEG fine
+      quality,
+    })) as Blob;
 
-  //   workingFile = new File(
-  //     [convertedBlob],
-  //     file.name.replace(/\.\w+$/, ".jpg"),
-  //     { type: "image/jpeg" }
-  //   );
-  // }
+    workingFile = new File(
+      [convertedBlob],
+      file.name.replace(/\.\w+$/, ".jpg"),
+      { type: "image/jpeg" }
+    );
+  }
 
   onProgress?.("Compressing image...");
 

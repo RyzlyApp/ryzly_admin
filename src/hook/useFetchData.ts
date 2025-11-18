@@ -3,7 +3,6 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { fetchSecureData, fetchUnsecureData } from "@/helper/services/api";
 
-
 interface UseFetchDataOptions {
   endpoint: string;
   name?: string;
@@ -11,6 +10,7 @@ interface UseFetchDataOptions {
   id?: string | number;
   queryKey?: (string | number | undefined)[];
   enable?: boolean;
+  pagination?: boolean
 }
 
 export const useFetchData = <T>({
@@ -20,10 +20,11 @@ export const useFetchData = <T>({
   id,
   queryKey = [],
   enable = true,
+  pagination
 }: UseFetchDataOptions): UseQueryResult<T> => {
   return useQuery<T>({
     queryKey: [name, endpoint, id, ...queryKey, JSON.stringify(params ?? {})],
-    queryFn: () => fetchSecureData<T>(endpoint, params),
+    queryFn: () => fetchSecureData<T>(endpoint, params, pagination),
     enabled: enable,
   });
 };

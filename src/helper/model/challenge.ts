@@ -5,9 +5,10 @@ export interface IChallenge {
     _id: string,
     thumbnail: string,
     IsEnded: boolean,
+    isApproved: boolean,
+    bookmarked: boolean,
     isPublic: boolean,
     title: string,
-    isApproved: boolean,
     description: string,
     winnerPrice: number,
     participationFee: number,
@@ -94,6 +95,7 @@ export interface ICertificate {
     "score": number,
     "startDate": string,
     "tracks": string[],
+    hasPaid: boolean,
     "updatedAt": string,
     "userFullname": string,
     "userId": string,
@@ -172,7 +174,7 @@ export interface IPortfolio {
     }[],
     challengeID?: string,
     taskID?: string,
-    tools: string[],
+    tools: string[], 
 }
 
 export interface IPortfolioDetails {
@@ -191,7 +193,7 @@ export interface IPortfolioDetails {
     "comments": string[],
     "createdAt": string,
     "updatedAt": string,
-    "url": string,
+    "url":string,
     "liked": boolean,
     likes: number
 }

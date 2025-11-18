@@ -46,7 +46,7 @@ export default function SearchField(
             isClearable
             value={value}
             onChange={onChange} 
-      onClear={onClear}
+            onClear={onClear}
             classNames={{
                 inputWrapper:
                     "bg-white border border-gray-300 rounded-full h-[40px]", // 👈 force height

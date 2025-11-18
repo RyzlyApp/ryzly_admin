@@ -8,10 +8,14 @@ import { useRouter } from 'next/navigation';
 import { IAuth, ILogin } from '@/helper/model/auth';
 import Cookies from "js-cookie";
 import { AxiosError } from 'axios';
+import { useState } from 'react';
 
 const useApproval = () => {
 
     const queryClient = useQueryClient()
+
+    const [open, setIsOpen] = useState(false)
+    const [show, setIsShow] = useState(false)
 
     const approveCoachMutation = useMutation({
         mutationFn: (data: {
@@ -35,18 +39,24 @@ const useApproval = () => {
         },
         onSuccess: (data) => {
 
+            setIsOpen(false)
+            setIsShow(false)
+
             queryClient.invalidateQueries({ queryKey: ["application"] })
+            queryClient.invalidateQueries({ queryKey: ["challengedetails"] })
+
+            
             addToast({
                 title: "Success",
                 description: data?.data?.message,
                 color: "success",
             })
         },
-    }); 
+    });
 
     const challengeApprovalMutation = useMutation({
         mutationFn: (data: {
-            challengeID: string     
+            challengeID: string
         }) => httpService.post(`/challenge/approve`, data),
         onError: (error: AxiosError) => {
 
@@ -63,18 +73,23 @@ const useApproval = () => {
         },
         onSuccess: (data) => {
 
+            setIsOpen(false)
+            setIsShow(false)
+
             queryClient.invalidateQueries({ queryKey: ["application"] })
+            queryClient.invalidateQueries({ queryKey: ["challengedetails"] })
+
             addToast({
                 title: "Success",
                 description: data?.data?.message,
                 color: "success",
             })
         },
-    }); 
+    });
 
     const challengeRejectMutation = useMutation({
         mutationFn: (data: {
-            challengeID: string     
+            challengeID: string
         }) => httpService.post(`/challenge/reject`, data),
         onError: (error: AxiosError) => {
 
@@ -92,21 +107,29 @@ const useApproval = () => {
         onSuccess: (data) => {
 
             queryClient.invalidateQueries({ queryKey: ["application"] })
+            queryClient.invalidateQueries({ queryKey: ["challengedetails"] })
+
+            setIsOpen(false)
+            setIsShow(false)
             addToast({
                 title: "Success",
                 description: data?.data?.message,
                 color: "success",
             })
         },
-    }); 
+    });
 
     const isLoading = approveCoachMutation.isPending || challengeApprovalMutation.isPending || challengeRejectMutation.isPending
 
-    return { 
-        approveCoachMutation, 
+    return {
+        approveCoachMutation,
         challengeApprovalMutation,
         challengeRejectMutation,
-        isLoading
+        isLoading,
+        open,
+        show,
+        setIsOpen,
+        setIsShow
     }
 }
 

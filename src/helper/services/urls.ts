@@ -2,9 +2,7 @@ export const URLS = {
     LOGIN: '/auth/signin',
     SIGNUP: '/auth/signup', 
     INTEREST: "/track/interests",
-    TRACK: "/track/tracks",
-    LEVEL: "/challenge/level",
-    INDUSTRY: "/challenge/Industry"
+    TRACK: "/track/tracks"
 }
 
 // export const IMAGE_URL = process.env.NEXT_PUBLIC_RESOURCE_URL as string; 

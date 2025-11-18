@@ -105,35 +105,23 @@ const useAuth = () => {
             }
         },
     });
+ 
 
-    const verifyMutation = useMutation({
-        mutationFn: (data: {
-            userId: string,
-            token: string
-        }) => unsecureHttpService.post(`/user-auth/verify-token/${data?.userId}/${data?.token}`, data),
-        onError: (error: AxiosError) => {
-            
-            const message =
-            (error?.response?.data as { message?: string })?.message ||
-            "Something went wrong";
-
-            addToast({
-                title: "Error",
-                description: message,
-                color: "danger",
-                timeout: 3000
-            })
+    const formikSignup = useFormik({
+        initialValues: {
+            email: "",
+            confirmemail: ""
         },
-        onSuccess: (data) => {
-
-            Cookies.set("accesstoken", data?.data?.data?.token);
-            addToast({
-                title: "Success",
-                description: data?.data?.message,
-                color: "success",
-            })
-            userDetails.mutate(data?.data?.data?.token)
-
+        validationSchema: Yup.object({
+            email: Yup.string()
+                .email("Invalid email format")
+                .required("Required"),
+            confirmemail: Yup.string()
+                .oneOf([Yup.ref("email")], "Emails must match")
+                .required("Required"),
+        }),
+        onSubmit: (data: IAuth) => {
+            signupMutation.mutate({ email: data.email })
         },
     });
 
@@ -155,24 +143,6 @@ const useAuth = () => {
         },
     });
 
-    const formikSignup = useFormik({
-        initialValues: {
-            email: "",
-            confirmemail: ""
-        },
-        validationSchema: Yup.object({
-            email: Yup.string()
-                .email("Invalid email format")
-                .required("Required"),
-            confirmemail: Yup.string()
-                .oneOf([Yup.ref("email")], "Emails must match")
-                .required("Required"),
-        }),
-        onSubmit: (data: IAuth) => {
-            signupMutation.mutate({ email: data.email })
-        },
-    });
-
 
     const isLoading = signupMutation?.isPending || loginMutation.isPending
 
@@ -180,8 +150,7 @@ const useAuth = () => {
         formik,
         formikSignup,
         loginMutation,
-        signupMutation,
-        verifyMutation,
+        signupMutation, 
         userDetails,
         isLoading
     }

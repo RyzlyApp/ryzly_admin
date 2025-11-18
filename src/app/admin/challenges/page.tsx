@@ -2,10 +2,9 @@
 import { useState } from "react";
 import ChallengesOverview from "@/components/admin/challenges/ChallengesOverview";
 import BestPerformingChallenge from "@/components/admin/challenges/BestPerformingChallenge";
-import ChallengesTableHeader from "@/components/admin/challenges/ChallengesTableHeader";
-import ChallengesTable from "@/components/admin/challenges/ChallengesTable";
-import ChallengesTablePagination from "@/components/admin/challenges/ChallengesTablePagination";
+import ChallengesTableHeader from "@/components/admin/challenges/ChallengesTableHeader";  
 import ChallengeInfo from "@/components/admin/challenges/ChallengeInfo";
+import { ChallengeTable } from "@/components/table";
 
 interface Challenge {
   id: string;
@@ -88,11 +87,9 @@ export default function AdminChallenges() {
               statusFilter={statusFilter}
               setStatusFilter={setStatusFilter}
             />
-            <ChallengesTable
-              challenges={mockChallenges}
-              onChallengeClick={handleChallengeClick}
-            />
-            <ChallengesTablePagination />
+            <div className=" w-full p-4 flex flex-col " > 
+            <ChallengeTable />
+            </div>
           </div>
         </>
       )}
