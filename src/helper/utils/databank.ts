@@ -80,7 +80,7 @@ export const adminLinks = [
     },
     {
         label: "Approvals",
-        link: "/admin/approvals",
+        link: "/admin/approvals?tab=payout",
         icon: FaCheckCircle,
     },
     {

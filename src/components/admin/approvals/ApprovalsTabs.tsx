@@ -19,12 +19,8 @@ export default function ApprovalsTabs({
 
   const router = useRouter()
 
-  const handleClick = (item: string) => {
-    if(activeTab === "payout") {
-      router.push(`/admin/approvals`)
-    } else {
-      router.push(`/admin/approvals?tab=${item}`)
-    }
+  const handleClick = (item: string) => { 
+      router.push(`/admin/approvals?tab=${item}`) 
   }
 
   return (
