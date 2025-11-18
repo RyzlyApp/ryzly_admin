@@ -30,6 +30,7 @@ const UsersTableHeader: React.FC<UsersTableHeaderProps> = ({
               <option value="Creators">Creators</option>
               <option value="Active">Active</option>
               <option value="Banned">Banned</option>
+              <option value="Banned">deactivated</option>
             </select>
             <RiArrowDownSLine
               className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400"

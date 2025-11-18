@@ -1,21 +1,21 @@
 "use client";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import ApprovalsTabs from "@/components/admin/approvals/ApprovalsTabs";
-import PayoutRequestsTable from "@/components/admin/approvals/PayoutRequestsTable";
-import ApprovalsTablePagination from "@/components/admin/approvals/ApprovalsTablePagination";
-import CoachApplicationTable from "@/components/admin/approvals/CoachApplicationTable";
-import ChallengeTable from "@/components/admin/approvals/ChallengeTable";
+// import PayoutRequestsTable from "@/components/admin/approvals/PayoutRequestsTable";
+// import ApprovalsTablePagination from "@/components/admin/approvals/ApprovalsTablePagination";
+// import CoachApplicationTable from "@/components/admin/approvals/CoachApplicationTable";
+// import ChallengeTable from "@/components/admin/approvals/ChallengeTable";
 import { useSearchParams } from "next/navigation";
 
-interface ApprovalRequest {
-  id: string;
-  name: string;
-  availableBalance: string;
-  amountRequested: string;
-  date: string;
-  status: "Pending" | "Approved";
-  avatar: string;
-}
+// interface ApprovalRequest {
+//   id: string;
+//   name: string;
+//   availableBalance: string;
+//   amountRequested: string;
+//   date: string;
+//   status: "Pending" | "Approved";
+//   avatar: string;
+// }
 
 
 export default function AdminApprovals() {
@@ -43,7 +43,7 @@ export default function AdminApprovals() {
         />
 
         <div className="p-6">
-          {!tab && (
+          {tab === "payout" && (
             <PayoutTable />
           )}
 
