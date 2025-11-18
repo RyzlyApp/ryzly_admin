@@ -29,7 +29,6 @@ export default function AdminApprovals() {
     { id: "challenge", label: "Challenge Application" },
   ];
 
-
   const CoachApproval = lazy(() => import("@/components/table").then(module => ({ default: module.CoachApproval })));
   const ChallengeApproval = lazy(() => import("@/components/table").then(module => ({ default: module.ChallengeApproval })));
   const PayoutTable = lazy(() => import("@/components/table").then(module => ({ default: module.PayoutTable })));
