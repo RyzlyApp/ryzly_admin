@@ -24,9 +24,9 @@ export default function AdminApprovals() {
   const tab = query?.get('tab') as string;
 
   const tabs = [
-    { id: "payout", label: "Payout Request" },
-    { id: "coach", label: "Coach Application" },
-    { id: "challenge", label: "Challenge Application" },
+    { id: "payout", label: "Payout Request", index: 0 },
+    { id: "coach", label: "Coach Application", index: 1 },
+    { id: "challenge", label: "Challenge Application", index: 2 },
   ];
 
   const CoachApproval = lazy(() => import("@/components/table").then(module => ({ default: module.CoachApproval })));
