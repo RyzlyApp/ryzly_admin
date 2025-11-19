@@ -145,7 +145,7 @@ export default function CoachApproval() {
                         ))}
                     </TableBody>
                 </Table>
-                <Pagination showControls initialPage={page} total={Number(data?.total)}
+                <Pagination showControls initialPage={page} total={Math.ceil(Number(data?.total))}
                     onChange={(page) => setPage(page)} />
             </div>
         </LoadingLayout>
