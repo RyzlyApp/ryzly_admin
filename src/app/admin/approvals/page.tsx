@@ -34,14 +34,14 @@ export default function AdminApprovals() {
   const PayoutTable = lazy(() => import("@/components/table").then(module => ({ default: module.PayoutTable })));
 
   return (
-    <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
-      <div className="bg-white rounded-lg shadow-sm">
-        <ApprovalsTabs
-          tabs={tabs}
-          activeTab={tab}
-        />
+    <div className="bg-white rounded-lg shadow-sm">
+      <ApprovalsTabs
+        tabs={tabs}
+        activeTab={tab}
+      />
 
-        <div className="p-6">
+      <div className="p-6">
+        <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
           {tab === "payout" && (
             <PayoutTable />
           )}
@@ -53,8 +53,8 @@ export default function AdminApprovals() {
           {tab === "challenge" && (
             <ChallengeApproval />
           )}
-        </div>
+        </Suspense>
       </div>
-    </Suspense>
+    </div>
   );
 }
