@@ -1,21 +1,12 @@
 "use client";
 import { lazy, Suspense } from "react";
-import ApprovalsTabs from "@/components/admin/approvals/ApprovalsTabs";
-// import PayoutRequestsTable from "@/components/admin/approvals/PayoutRequestsTable";
-// import ApprovalsTablePagination from "@/components/admin/approvals/ApprovalsTablePagination";
-// import CoachApplicationTable from "@/components/admin/approvals/CoachApplicationTable";
-// import ChallengeTable from "@/components/admin/approvals/ChallengeTable";
+import ApprovalsTabs from "@/components/admin/approvals/ApprovalsTabs"; 
 import { useSearchParams } from "next/navigation";
 
-// interface ApprovalRequest {
-//   id: string;
-//   name: string;
-//   availableBalance: string;
-//   amountRequested: string;
-//   date: string;
-//   status: "Pending" | "Approved";
-//   avatar: string;
-// }
+
+const CoachApproval = lazy(() => import("@/components/table").then(module => ({ default: module.CoachApproval })));
+const ChallengeApproval = lazy(() => import("@/components/table").then(module => ({ default: module.ChallengeApproval })));
+const PayoutTable = lazy(() => import("@/components/table").then(module => ({ default: module.PayoutTable })));
 
 
 export default function AdminApprovals() {
@@ -28,10 +19,6 @@ export default function AdminApprovals() {
     { id: "coach", label: "Coach Application", index: 1 },
     { id: "challenge", label: "Challenge Application", index: 2 },
   ];
-
-  const CoachApproval = lazy(() => import("@/components/table").then(module => ({ default: module.CoachApproval })));
-  const ChallengeApproval = lazy(() => import("@/components/table").then(module => ({ default: module.ChallengeApproval })));
-  const PayoutTable = lazy(() => import("@/components/table").then(module => ({ default: module.PayoutTable })));
 
   return (
     <div className="bg-white rounded-lg shadow-sm">
