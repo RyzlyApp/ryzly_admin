@@ -36,8 +36,9 @@ export default function ApprovalsTabs({
             variant="underlined"
             classNames={{
               tabList: "gap-4",
-              tab: "text-gray-600 data-[selected=true]:text-primary ",
-              cursor: "bg-primary", // underline color
+              tab: "text-primary ",
+              // tabContent: activeTab ===  ? "text-primary font-semibold " : "",
+              cursor: " text-primary bg-primary", // underline color
             }}
           >
             {tabs.map((variant) => (
