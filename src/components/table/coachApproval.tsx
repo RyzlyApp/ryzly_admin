@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { CustomButton } from "../custom";
 import { IPagination } from "@/helper/model/pagination";
 import { LoadingLayout } from "../shared";
+import { textLimit } from "@/helper/utils/textlimit";
 
 
 export default function CoachApproval() {
@@ -46,7 +47,7 @@ export default function CoachApproval() {
             setCoachData([]);
         }
     }, [data?.data, isLoading]); 
- 
+
     return (
         <LoadingLayout loading={isLoading} lenght={data?.data?.length} >
 
@@ -57,6 +58,8 @@ export default function CoachApproval() {
                         <TableColumn>Years Of Experience</TableColumn>
                         <TableColumn>Expertise</TableColumn>
                         <TableColumn>FocusArea</TableColumn>
+                        <TableColumn>LinkedIn Url</TableColumn>
+                        <TableColumn>Portfolio Url</TableColumn>
                         <TableColumn>Date</TableColumn>
                         <TableColumn>Status</TableColumn>
                         <TableColumn>Action</TableColumn>
@@ -90,6 +93,12 @@ export default function CoachApproval() {
                                 </TableCell>
                                 <TableCell className="py-4 px-4 text-sm text-gray-900">
                                     {request?.focusArea}
+                                </TableCell>
+                                <TableCell className="py-4 px-4 text-sm text-gray-900">
+                                    <a target="_blank" className=" text-neonblue-600 " href={request?.linkedInUrl} >{textLimit(request?.linkedInUrl, 30)}</a>
+                                </TableCell>
+                                <TableCell className="py-4 px-4 text-sm text-gray-900">
+                                    <a target="_blank" className=" text-neonblue-600 " href={request?.portfolioUrl} >{textLimit(request?.portfolioUrl, 30)}</a>
                                 </TableCell>
                                 <TableCell className="py-4 px-6 text-sm text-gray-900">
                                     {dateFormat(request.createdAt)}
@@ -133,6 +142,19 @@ export default function CoachApproval() {
                                                 Reject
                                             </CustomButton>
                                         </div>
+                                    ) : request.status === "DECLINED" ? (
+                                        <div className=" flex gap-3 items-center " >
+                                            <CustomButton
+                                                variant="primary"
+                                                size="sm"
+                                                height="32px"
+                                                fontSize="12px"
+                                                isLoading={loading && request?._id === id && status === "APPROVED"}
+                                                onClick={() => handleClick(request?._id, "APPROVED")}
+                                            >
+                                                Approve
+                                            </CustomButton>
+                                        </div>
                                     ) : (
                                         <span className={` text-sm ${request?.status === "DECLINED" ? " text-red-600  " : " text-green-600 "}font-medium `}>
                                             {request?.status === "DECLINED" ?
@@ -145,7 +167,7 @@ export default function CoachApproval() {
                         ))}
                     </TableBody>
                 </Table>
-                <Pagination showControls initialPage={page} total={Number(data?.total)}
+                <Pagination showControls initialPage={page} total={Math.ceil(Number(data?.total))}
                     onChange={(page) => setPage(page)} />
             </div>
         </LoadingLayout>
