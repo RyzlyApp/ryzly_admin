@@ -16,7 +16,7 @@ import {
 import { FaCheckCircle } from "react-icons/fa";
 import { FaAward } from "react-icons/fa6";
 import { IoPeopleCircleOutline } from "react-icons/io5";
-import { FiUser } from "react-icons/fi";
+import { FiUser, FiUsers } from "react-icons/fi";
 import { AiOutlineSetting } from "react-icons/ai";
 
 export const sidebarlink = [
@@ -67,6 +67,11 @@ export const adminLinks = [
         label: "Users",
         link: "/admin/users",
         icon: PiUsersFill,
+    },
+     {
+        label: "Waitlist",
+        link: "/admin/waitlist",
+        icon: FiUsers,
     },
     {
         label: "Challenges",
