@@ -34,7 +34,7 @@ export default function WaitList() {
         if (analyticsData) {
             const total = Number(analyticsData?.data?.data ?? 0);
             setTotalEntries(total || null);
-            const pages = Math.max(1, Math.ceil(total / 10));
+            const pages = Math.max(1, Math.ceil(total / 20));
             setTotalPages(pages);
             if (page > pages) {
                 setPage(pages);
