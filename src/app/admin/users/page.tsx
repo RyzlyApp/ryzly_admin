@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import StatCard, { StatCardProps } from "@/components/admin/users/StatCard";
 import UsersTableHeader from "@/components/admin/users/UsersTableHeader";
 import UsersTable from "@/components/admin/users/UsersTable";
@@ -9,80 +9,34 @@ import { TbUsers } from "react-icons/tb";
 import { RiOrganizationChart } from "react-icons/ri";
 import { BsFileText } from "react-icons/bs";
 import { LiaChalkboardTeacherSolid } from "react-icons/lia";
+import httpService from "@/helper/services/httpService";
+import useUsers from "@/hook/useUsers";
 
-interface User {
-  id: string;
-  name: string;
-  role: string;
-  email: string;
-  location: string;
-  joinedOn: string;
-  status: "Active" | "Banned";
-  avatar: string;
-  isCoach?: boolean;
-}
+export default function AdminUsers() {
+  const { filter, setFilter } = useUsers();
+  const [statsDetails, setStatsDetails] = useState({
+    totalCoaches: 0,
+    totalPendingApplications: 0,
+    totalUsers: 0,
+  });
 
-const mockUsers: User[] = [
-  {
-    id: "1",
-    name: "Ngozi Nnamani",
-    role: "Product Designer",
-    email: "ngozi@mail.com",
-    location: "Lagos, Nigeria",
-    joinedOn: "01 Sep, 2025",
-    status: "Active",
-    avatar: "NN",
-    isCoach: true,
-  },
-  {
-    id: "2",
-    name: "Obinna Afolayan",
-    role: "Product Designer",
-    email: "obinna@mail.com",
-    location: "Lagos, Nigeria",
-    joinedOn: "01 Sep, 2025",
-    status: "Active",
-    avatar: "OA",
-  },
-  {
-    id: "3",
-    name: "Oluwaseyi Okoli",
-    role: "Product Designer",
-    email: "oluwaseyi@mail.com",
-    location: "Lagos, Nigeria",
-    joinedOn: "01 Sep, 2025",
-    status: "Active",
-    avatar: "OO",
-    isCoach: true,
-  },
-  {
-    id: "4",
-    name: "Obinna Adeyemi",
-    role: "Product Designer",
-    email: "obinna.adeyemi@mail.com",
-    location: "Lagos, Nigeria",
-    joinedOn: "01 Sep, 2025",
-    status: "Active",
-    avatar: "OA",
-  },
-  {
-    id: "5",
-    name: "Olumide Afolayan",
-    role: "Product Designer",
-    email: "olumide@mail.com",
-    location: "Lagos, Nigeria",
-    joinedOn: "01 Sep, 2025",
-    status: "Banned",
-    avatar: "OA",
-  },
-];
+  // get analytics
+  const getAnalytics = async () => {
+    const response = await httpService.get("/admin-analytics");
+    setStatsDetails(response.data?.data);
+  };
 
-const stats: StatCardProps[] = [
+  React.useEffect(() => {
+    getAnalytics();
+  }, []);
+
+  const stats: StatCardProps[] = React.useMemo(() => {
+    return [
   {
     icon: <TbUsers />,
     iconBgColor: "bg-[#EEF0FF]",
     iconTextColor: "text-[#596AFE]",
-    value: "10,000",
+    value: statsDetails?.totalUsers?.toString(),
     label: "Total Users",
     trend: "2.5%",
     trendDirection: "down",
@@ -93,9 +47,9 @@ const stats: StatCardProps[] = [
     icon: <RiOrganizationChart />,
     iconBgColor: "bg-[#ECF5CA99]",
     iconTextColor: "text-[#8A9E3C]",
-    value: "500",
+    value: "0",
     label: "Organizations",
-    trend: "3.5%",
+    trend: "0%",
     trendDirection: "up",
     trendColor: "text-green-600",
     footerText: "From last month",
@@ -104,7 +58,7 @@ const stats: StatCardProps[] = [
     icon: <LiaChalkboardTeacherSolid />,
     iconBgColor: "bg-[#EEF0FF]",
     iconTextColor: "text-[#596AFE]",
-    value: "7,000",
+    value: statsDetails?.totalCoaches?.toString(),
     label: "Coaches",
     trend: "3.5%",
     trendDirection: "up",
@@ -115,41 +69,24 @@ const stats: StatCardProps[] = [
     icon: <BsFileText />,
     iconBgColor: "bg-[#FFF1EE]",
     iconTextColor: "text-[#FC7753]",
-    value: "300",
+    value: statsDetails?.totalPendingApplications?.toString(),
     label: "Pending Coach Applications",
-    trend: "100 approved this month",
+    trend: "",
     trendDirection: "up",
     trendColor: "text-green-600",
     footerText: "",
   },
 ];
-
-export default function AdminUsers() {
-  const [sortBy, setSortBy] = useState("Recent");
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-
-  const handleUserClick = (user: User) => {
-    setSelectedUser(user);
-  };
-
-  const handleBackToList = () => {
-    setSelectedUser(null);
-  };
-
-  if (selectedUser) {
-    return <UserProfile user={selectedUser} onBack={handleBackToList} />;
-  }
+  }, [statsDetails]);
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <StatCard key={index} {...stat} />
-        ))}
+        {stats.map((stat, index) => <StatCard key={index} {...stat} />)}
       </div>
       <div className="bg-white rounded-lg shadow-sm">
-        <UsersTableHeader sortBy={sortBy} setSortBy={setSortBy} />
-        <UsersTable users={mockUsers} onUserClick={handleUserClick} />
+        <UsersTableHeader sortBy={filter} setSortBy={(e) => setFilter(e)} />
+        <UsersTable />
         <UsersTablePagination />
       </div>
     </div>

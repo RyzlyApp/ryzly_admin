@@ -1,35 +1,54 @@
 import React from "react";
-import { Avatar } from "@heroui/react";
+import { Avatar, Spinner } from "@heroui/react";
 import CustomButton from "@/components/custom/customButton";
-import { useFetchData } from "@/hook/useFetchData";
+import httpService from "@/helper/services/httpService";
+import { IUser } from "@/app/types/User";
+import { PaginatedReturnType } from "@/app/types/PaginatedReturnType";
+import useUsers from "@/hook/useUsers";
 
-interface User {
-  id: string;
-  name: string;
-  role: string;
-  email: string;
-  location: string;
-  joinedOn: string;
-  status: "Active" | "Banned";
-  avatar: string;
-  isCoach?: boolean;
-}
-
-interface UsersTableProps {
-  users: User[];
-  onUserClick?: (user: User) => void;
-}
-
-const UsersTable: React.FC<UsersTableProps> = ({ users, onUserClick }) => {
+const UsersTable: React.FC = ({ }) => {
 
 
-  const { data, isLoading } = useFetchData<any[]>({ name: "user", endpoint: "/user/admin" });
+  const { limit, offset, filter, users, setUsers, isLoading, setIsLoading, setTotal } = useUsers();
 
-  console.log(data);
+  const loadUsers = React.useCallback(async() => {
+    setIsLoading(true);
+    const params: Record<string, unknown> = {
+      limit,
+      page: offset,
+    }
+
+    if (filter === 'coach') {
+      params['isCoach'] = true;
+    }
+
+    if (filter === 'active') {
+      params['isSuspended'] = false;
+    }
+
+    if (filter === 'banned') {
+      params['isSuspended'] = true;
+    }
+    const response = await httpService.get('/admin-user', {
+      params
+    });
+
+    const data = response?.data as PaginatedReturnType<IUser[]>;
+    setUsers(data?.data);
+    setTotal(data?.total);
+    setIsLoading(false);
+  }, [limit, offset, setIsLoading, setTotal, setUsers, filter]);
+
+  React.useEffect(() => {
+    loadUsers();
+  }, [loadUsers])
+
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full">
+     
+      {!isLoading && users?.length > 0 && (
+        <table className="w-full">
         <thead className="bg-gray-50">
           <tr>
             <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
@@ -55,23 +74,24 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onUserClick }) => {
         <tbody>
           {users.map((user) => (
             <tr
-              key={user.id}
+              key={user._id}
               className="border-b border-gray-100 hover:bg-gray-50"
             >
               <td className="py-4 px-6">
                 <div
                   className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                  onClick={() => onUserClick?.(user)}
+                  onClick={() => {}}
                 >
                   <Avatar
                     className="w-8 h-8 text-xs"
-                    name={user.avatar}
+                    name={user?.fullName}
+                    src={user?.profilePicture}
                     color="primary"
                   />
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-gray-900">
-                        {user.name}
+                        {user.fullName || 'N/A'}
                       </span>
                       {user.isCoach && (
                         <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
@@ -79,29 +99,29 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onUserClick }) => {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-600">{user.role}</p>
+                    <p className="text-xs text-gray-600">{user.track}</p>
                   </div>
                 </div>
               </td>
               <td className="py-4 px-6 text-sm text-gray-900">{user.email}</td>
               <td className="py-4 px-6 text-sm text-gray-900">
-                {user.location}
+                {user.country}
               </td>
               <td className="py-4 px-6 text-sm text-gray-900">
-                {user.joinedOn}
+                {new Date(user.createdAt).toDateString()}
               </td>
               <td className="py-4 px-6">
                 <div className="flex items-center gap-2">
                   <div
                     className={`w-2 h-2 rounded-full ${
-                      user.status === "Active" ? "bg-blue-500" : "bg-red-500"
+                      !user.isSuspended ? "bg-blue-500" : "bg-red-500"
                     }`}
                   ></div>
-                  <span className="text-sm text-gray-600">{user.status}</span>
+                  <span className="text-sm text-gray-600">{user.isSuspended ? 'BANNED':'ACTIVE'}</span>
                 </div>
               </td>
               <td className="py-4 px-6">
-                {user.status === "Active" ? (
+                {!user.isSuspended ? (
                   <CustomButton
                     variant="customDanger"
                     size="sm"
@@ -125,6 +145,20 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onUserClick }) => {
           ))}
         </tbody>
       </table>
+      )}
+
+      {!isLoading && users?.length < 1 && (
+        <div className="w-full h-24 flex justify-center items-center flex-col">
+          <p>There are currently no users</p>
+        </div>
+      )}
+
+       {isLoading && users?.length < 1 && (
+        <div className="w-full h-24 flex justify-center items-center flex-col">
+          <Spinner />
+          <p>Loading users...</p>
+        </div>
+      )}
     </div>
   );
 };
