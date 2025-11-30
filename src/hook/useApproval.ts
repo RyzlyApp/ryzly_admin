@@ -119,12 +119,48 @@ const useApproval = () => {
         },
     });
 
-    const isLoading = approveCoachMutation.isPending || challengeApprovalMutation.isPending || challengeRejectMutation.isPending
+    const approvePayoutMutation = useMutation({
+        mutationFn: (data: {
+            id: string,
+            payload : {
+                status: "pending" | "approved" | "declined"
+            }
+        }) => httpService.patch(`/payout/${data?.id}/status`, data?.payload),
+        onError: (error: AxiosError) => {
+
+            const message =
+                (error?.response?.data as { message?: string })?.message ||
+                "Something went wrong";
+
+            addToast({
+                title: "Error",
+                description: message,
+                color: "danger",
+                timeout: 3000
+            })
+        },
+        onSuccess: (data) => {
+
+            queryClient.invalidateQueries({ queryKey: ["application"] })
+            queryClient.invalidateQueries({ queryKey: ["challengedetails"] })
+
+            setIsOpen(false)
+            setIsShow(false)
+            addToast({
+                title: "Success",
+                description: data?.data?.message,
+                color: "success",
+            })
+        },
+    });
+
+    const isLoading = approveCoachMutation.isPending || challengeApprovalMutation.isPending || challengeRejectMutation.isPending || approvePayoutMutation.isPending
 
     return {
         approveCoachMutation,
         challengeApprovalMutation,
         challengeRejectMutation,
+        approvePayoutMutation,
         isLoading,
         open,
         show,
