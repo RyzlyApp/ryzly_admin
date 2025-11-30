@@ -17,6 +17,11 @@ export default function AdminSettings() {
 
   const Tabs: Tab[] = [
     {
+      name: "Social",
+      icon: <BiUser />,
+      component: <AccountSettings />,
+    },
+    {
       name: "Account",
       icon: <BiUser />,
       component: <AccountSettings />,
