@@ -18,4 +18,6 @@ export interface IUser {
   country: string;
   profilePicture: string;
   _id: string;
+  firstName: string;
+  lastName: string;
 }

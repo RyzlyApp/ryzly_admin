@@ -59,11 +59,12 @@ export default function PayoutRequestsTable({
                   <div className="flex items-center gap-3">
                     <Avatar
                       className="w-8 h-8 text-xs"
-                      name={request.avatar}
+                      name={request?.userId?.firstName}
+                      src={request?.userId?.profilePicture}
                       color="primary"
                     />
                     <span className="text-sm font-medium text-gray-900">
-                      {request.name}
+                      {request?.userId?.firstName} {request?.userId?.lastName}
                     </span>
                   </div>
                 </td>
