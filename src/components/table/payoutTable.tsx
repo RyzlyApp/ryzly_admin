@@ -55,7 +55,7 @@ export default function PayoutTable() {
                         {payoutData?.map((item, index) => {
                             return (
                                 <TableRow key={index}>
-                                    <TableCell>{item?.userId}</TableCell> 
+                                    <TableCell>{item?.userId?.firstName+" "+item?.userId?.lastName}</TableCell> 
                                     <TableCell>{formatNumber(item?.amount)}</TableCell>
                                     <TableCell>{dateFormat(item?.createdAt)}</TableCell>
                                     <TableCell>

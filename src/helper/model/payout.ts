@@ -1,8 +1,9 @@
+import { IUser } from "./user";
 
 export interface IPayout {
     "_id": string,
     "isDeleted": boolean,
-    "userId": string,
+    "userId": IUser,
     "amount": number,
     "bankId": string,
     "status": string,

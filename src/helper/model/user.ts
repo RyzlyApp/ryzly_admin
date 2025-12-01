@@ -13,6 +13,8 @@ export interface IUser {
     "interets": string[], 
     "about": string,
     "fullName": string,
+    firstName: string
+    lastName: string,
     "profilePicture": string,
     "track": string,
     "country": string,
