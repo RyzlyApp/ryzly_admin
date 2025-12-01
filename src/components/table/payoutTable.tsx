@@ -19,7 +19,10 @@ export default function PayoutTable() {
 
     const { approvePayoutMutation, isLoading: loading } = useApproval()
 
-    const { data, isLoading } = useFetchData<IPagination<IPayout>>({ name: "application", endpoint: "/payout/admin" });
+    const { data, isLoading } = useFetchData<IPagination<IPayout>>({ name: "application", endpoint: "/payout/admin", params: {
+        limit: 10,
+        page: page
+    } });
 
 
     useEffect(() => {
@@ -39,6 +42,9 @@ export default function PayoutTable() {
             }
         })
     }
+
+    console.log(Math.ceil(Number(data?.total)/10))
+    
 
     return (
         <LoadingLayout loading={isLoading} lenght={data?.items?.length} >
@@ -112,7 +118,7 @@ export default function PayoutTable() {
                         })}
                     </TableBody>
                 </Table>
-                <Pagination showControls initialPage={page} total={Math.ceil(Number(data?.total))}
+                <Pagination showControls initialPage={page} total={Math.ceil(Number(data?.total)/10)}
                     onChange={(page) => setPage(page)} />
             </div>
         </LoadingLayout>
