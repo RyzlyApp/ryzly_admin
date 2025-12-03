@@ -1,7 +1,7 @@
 "use client"
 import { useFetchData } from "@/hook/useFetchData";
-import { Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
-import { LoadingLayout } from "../shared";
+import { InputOtp, Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
+import { LoadingLayout, ModalLayout } from "../shared";
 import { IPagination } from "@/helper/model/pagination";
 import { IPayout } from "@/helper/model/payout";
 import { useEffect, useState } from "react";
@@ -17,12 +17,14 @@ export default function PayoutTable() {
     const [payoutData, setPayoutData] = useState<IPayout[]>([])
     const [page, setPage] = useState(1)
 
-    const { approvePayoutMutation, isLoading: loading } = useApproval()
+    const { approvePayoutMutation, isLoading: loading, formik, verifyPayoutMutation, open, setIsOpen } = useApproval()
 
-    const { data, isLoading } = useFetchData<IPagination<IPayout>>({ name: "application", endpoint: "/payout/admin", params: {
-        limit: 10,
-        page: page
-    } });
+    const { data, isLoading } = useFetchData<IPagination<IPayout>>({
+        name: "payout", endpoint: "/payout/admin", params: {
+            limit: 10,
+            page: page
+        }
+    });
 
 
     useEffect(() => {
@@ -31,10 +33,11 @@ export default function PayoutTable() {
         } else {
             setPayoutData([]);
         }
-    }, [data?.data, isLoading]);
+    }, [data, isLoading]);
 
     const handleClick = (item: string, status: "pending" | "approved" | "declined") => {
         setId(item)
+        setStatus(status)
         approvePayoutMutation.mutate({
             id: item,
             payload: {
@@ -43,15 +46,14 @@ export default function PayoutTable() {
         })
     }
 
-    console.log(Math.ceil(Number(data?.total)/10))
-    
+    console.log(formik.values);
 
     return (
         <LoadingLayout loading={isLoading} lenght={data?.items?.length} >
             <div className="w-full flex flex-col gap-6 items-center">
                 <Table aria-label="Example static collection table">
                     <TableHeader>
-                        <TableColumn>NAME</TableColumn> 
+                        <TableColumn>NAME</TableColumn>
                         <TableColumn>Amount Requested</TableColumn>
                         <TableColumn>Date</TableColumn>
                         <TableColumn>STATUS</TableColumn>
@@ -61,7 +63,7 @@ export default function PayoutTable() {
                         {payoutData?.map((item, index) => {
                             return (
                                 <TableRow key={index}>
-                                    <TableCell>{item?.userId?.firstName+" "+item?.userId?.lastName}</TableCell> 
+                                    <TableCell>{item?.userId?.firstName + " " + item?.userId?.lastName}</TableCell>
                                     <TableCell>{formatNumber(item?.amount)}</TableCell>
                                     <TableCell>{dateFormat(item?.createdAt)}</TableCell>
                                     <TableCell>
@@ -118,8 +120,29 @@ export default function PayoutTable() {
                         })}
                     </TableBody>
                 </Table>
-                <Pagination showControls initialPage={page} total={Math.ceil(Number(data?.total)/10)}
+                <Pagination showControls initialPage={page} total={Math.ceil(Number(data?.total) / 10)}
                     onChange={(page) => setPage(page)} />
+
+                <ModalLayout isOpen={open} onClose={() => setIsOpen(false)}>
+                    <div className=" w-full flex flex-col gap-3 items-center " >
+                        <p className=" text-sm font-medium text-center " >Enter the OTP sent to your email</p>
+                        <InputOtp
+                            length={6}
+                            onValueChange={(value) => formik.setFieldValue("otp", value)}
+                        />
+                        <CustomButton
+                            variant="primary"
+                            size="sm"
+                            height="32px"
+                            fontSize="12px"
+                            fullWidth
+                            isLoading={verifyPayoutMutation.isPending}
+                            onClick={() => formik.handleSubmit()}
+                        >
+                            Verify
+                        </CustomButton>
+                    </div>
+                </ModalLayout>
             </div>
         </LoadingLayout>
     )

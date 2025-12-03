@@ -1,13 +1,10 @@
-"use client"
-import * as Yup from 'yup';
-import { useFormik } from "formik";
+"use client" 
 import { addToast } from "@heroui/toast";
-import httpService, { unsecureHttpService } from '@/helper/services/httpService';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { IAuth, ILogin } from '@/helper/model/auth';
-import Cookies from "js-cookie";
+import httpService from '@/helper/services/httpService';
+import { useMutation, useQueryClient } from '@tanstack/react-query'; 
 import { AxiosError } from 'axios';
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
 import { useState } from 'react';
 
 const useApproval = () => {
@@ -15,7 +12,7 @@ const useApproval = () => {
     const queryClient = useQueryClient()
 
     const [open, setIsOpen] = useState(false)
-    const [show, setIsShow] = useState(false)
+    const [show, setIsShow] = useState(false)  
 
     const approveCoachMutation = useMutation({
         mutationFn: (data: {
@@ -141,16 +138,66 @@ const useApproval = () => {
         },
         onSuccess: (data) => {
 
-            queryClient.invalidateQueries({ queryKey: ["application"] })
-            queryClient.invalidateQueries({ queryKey: ["challengedetails"] })
+            formik.setFieldValue("transferCode", data?.data?.data?.paystackRef?.transfer_code)
+            formik.setFieldValue("payoutId", data?.data?.data?.payout?._id) 
+            
+        
+            setIsOpen(true) 
+            addToast({
+                title: data?.data?.message === "Insufficient wallet balance; payout declined" ? "Error" : "Success",
+                description: data?.data?.message,
+                color: data?.data?.message === "Insufficient wallet balance; payout declined" ? "danger" : "success",
+            })
+        },
+    });
 
-            setIsOpen(false)
-            setIsShow(false)
+
+    const verifyPayoutMutation = useMutation({
+        mutationFn: (data: {
+            otp: string,
+            transferCode: string
+          }) => httpService.post(`/payout/finalize-transfer`, data),
+        onError: (error: AxiosError) => {
+
+            const message =
+                (error?.response?.data as { message?: string })?.message ||
+                "Something went wrong";
+
+            addToast({
+                title: "Error",
+                description: message,
+                color: "danger",
+                timeout: 3000
+            })
+        },
+        onSuccess: (data) => {
+
+            queryClient.invalidateQueries({ queryKey: ["payout"] }) 
+
+            setIsOpen(false) 
             addToast({
                 title: "Success",
                 description: data?.data?.message,
                 color: "success",
             })
+        },
+    });
+
+
+    const formik = useFormik({
+        initialValues: {
+            otp: "", 
+            transferCode: "",
+            payoutId: ""
+        },
+        validationSchema: Yup.object({
+            otp: Yup.string()
+                .required("Required"), 
+            transferCode: Yup.string()
+                .required("Required")
+        }),
+        onSubmit: (data: { otp: string, transferCode: string, payoutId: string }) => {
+            verifyPayoutMutation.mutate(data)
         },
     });
 
@@ -161,11 +208,13 @@ const useApproval = () => {
         challengeApprovalMutation,
         challengeRejectMutation,
         approvePayoutMutation,
+        verifyPayoutMutation,
         isLoading,
         open,
         show,
         setIsOpen,
-        setIsShow
+        setIsShow, 
+        formik
     }
 }
 
