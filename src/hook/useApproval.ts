@@ -51,6 +51,39 @@ const useApproval = () => {
         },
     });
 
+
+    const coachPaymentMutation = useMutation({
+        mutationFn: (data: string) => httpService.post(`/payout/pay-creator/${data}`, {}),
+        onError: (error: AxiosError) => {
+
+            const message =
+                (error?.response?.data as { message?: string })?.message ||
+                "Something went wrong";
+
+            addToast({
+                title: "Error",
+                description: message,
+                color: "danger",
+                timeout: 3000
+            })
+        },
+        onSuccess: (data) => {
+
+            setIsOpen(false)
+            setIsShow(false)
+
+            queryClient.invalidateQueries({ queryKey: ["application"] })
+            queryClient.invalidateQueries({ queryKey: ["challengedetails"] })
+
+            
+            addToast({
+                title: "Success",
+                description: data?.data?.message,
+                color: "success",
+            })
+        },
+    });
+
     const challengeApprovalMutation = useMutation({
         mutationFn: (data: {
             challengeID: string
@@ -201,7 +234,7 @@ const useApproval = () => {
         },
     });
 
-    const isLoading = approveCoachMutation.isPending || challengeApprovalMutation.isPending || challengeRejectMutation.isPending || approvePayoutMutation.isPending
+    const isLoading = approveCoachMutation.isPending || challengeApprovalMutation.isPending || challengeRejectMutation.isPending || approvePayoutMutation.isPending || coachPaymentMutation?.isPending
 
     return {
         approveCoachMutation,
@@ -212,6 +245,7 @@ const useApproval = () => {
         isLoading,
         open,
         show,
+        coachPaymentMutation,
         setIsOpen,
         setIsShow, 
         formik
