@@ -37,10 +37,7 @@ export default function ChallengeInfo({
       })
     }
 
-  }
-
-  console.log(show);
-  
+  } 
 
   return (
     <div className=" w-full rounded-3xl flex flex-col bg-white ">
@@ -103,7 +100,7 @@ export default function ChallengeInfo({
             </span>
           </p>
         </div>
-        {(!approve && isDateInPast(item?.endDate) && !item?.isCreatorPaid)&& (
+        {(!approve && item?.IsEnded && !item?.isCreatorPaid)&& (
           <div className=" w-[300px] px-4 " > 
             <CustomButton
               variant="primary"
