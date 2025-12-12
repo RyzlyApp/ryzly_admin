@@ -37,10 +37,7 @@ export default function ChallengeInfo({
       })
     }
 
-  }
-
-  console.log(show);
-  
+  } 
 
   return (
     <div className=" w-full rounded-3xl flex flex-col bg-white ">
@@ -94,8 +91,7 @@ export default function ChallengeInfo({
           <div
             className=" text-xs font-medium text-violet-300 "
             dangerouslySetInnerHTML={{ __html: item?.description }}
-          />
-          {/* <p className=" text-violet-300 text-sm font-medium " >{item?.description}</p> */}
+          /> 
           <p className=" text-violet-300 text-xs font-medium ">
             Participation Fee:{" "}
             <span className=" font-bold ">
@@ -103,7 +99,7 @@ export default function ChallengeInfo({
             </span>
           </p>
         </div>
-        {(!approve && isDateInPast(item?.endDate) && !item?.isCreatorPaid)&& (
+        {(!approve && item?.IsEnded && !item?.isCreatorPaid)&& (
           <div className=" w-[300px] px-4 " > 
             <CustomButton
               variant="primary"
