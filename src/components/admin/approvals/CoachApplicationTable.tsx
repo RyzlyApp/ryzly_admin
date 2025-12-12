@@ -86,13 +86,13 @@ export default function CoachApplicationTable({
                                         <div className=" w-fit " >
                                             <Avatar
                                                 className="w-8 h-8 text-xs"
-                                                name={request.user?.fullName}
+                                                name={request.user?.firstName}
                                                 src={request?.user?.profilePicture}
                                                 color="primary"
                                             />
                                         </div>
                                         <span className="text-xs w-40 font-medium text-gray-900">
-                                            {request?.user?.fullName}
+                                            {request?.user?.firstName} {request?.user?.lastName}
                                         </span>
                                     </div>
                                 </td>

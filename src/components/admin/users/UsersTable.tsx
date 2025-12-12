@@ -84,14 +84,14 @@ const UsersTable: React.FC = ({ }) => {
                 >
                   <Avatar
                     className="w-8 h-8 text-xs"
-                    name={user?.fullName}
+                    name={user?.firstName}
                     src={user?.profilePicture}
                     color="primary"
                   />
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-gray-900">
-                        {user.fullName || 'N/A'}
+                        {user?.firstName} {user?.lastName}
                       </span>
                       {user.isCoach && (
                         <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">

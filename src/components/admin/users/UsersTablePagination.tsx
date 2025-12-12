@@ -1,5 +1,4 @@
-import useUsers from "@/hook/useUsers";
-import { useUser } from "@heroui/react";
+import useUsers from "@/hook/useUsers"; 
 import React from "react";
 
 const UsersTablePagination = () => {
