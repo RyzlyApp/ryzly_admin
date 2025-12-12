@@ -12,6 +12,7 @@ export interface IChallenge {
     description: string,
     winnerPrice: number,
     participationFee: number,
+    isCreatorPaid: boolean,
     category: string,
     tags: string[],
     isPublish: boolean,

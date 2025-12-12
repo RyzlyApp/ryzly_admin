@@ -10,6 +10,7 @@ import { capitalizeFLetter } from "@/helper/utils/capitalLetter";
 import { textLimit } from "@/helper/utils/textlimit";
 import useApproval from "@/hook/useApproval";
 import { useSearchParams } from "next/navigation";
+import { isDateInPast } from "@/helper/utils/isPast";
 
 export default function ChallengeInfo({
   item,
@@ -19,7 +20,7 @@ export default function ChallengeInfo({
   refetching: boolean;
 }) {
 
-  const { isLoading: loading, challengeApprovalMutation, challengeRejectMutation, open, show, setIsOpen, setIsShow } = useApproval()
+  const { isLoading: loading, challengeApprovalMutation, challengeRejectMutation, open, show, setIsOpen, setIsShow, coachPaymentMutation } = useApproval()
 
   const query = useSearchParams();
   const approve = query?.get('approve') as string;
@@ -37,6 +38,9 @@ export default function ChallengeInfo({
     }
 
   }
+
+  console.log(show);
+  
 
   return (
     <div className=" w-full rounded-3xl flex flex-col bg-white ">
@@ -99,6 +103,21 @@ export default function ChallengeInfo({
             </span>
           </p>
         </div>
+        {(!approve && isDateInPast(item?.endDate) && !item?.isCreatorPaid)&& (
+          <div className=" w-[300px] px-4 " > 
+            <CustomButton
+              variant="primary"
+              size="sm"
+              height="35px"
+              fontSize="12px"
+              fullWidth
+              // isLoading={loading && item?._id === id && status === "approve"}
+              onClick={() => setIsShow(true)}
+            >
+              Approve
+            </CustomButton>
+          </div>
+        )}
         {approve && (
           <div className=" flex gap-3 w-full px-4" >
             {(!item?.isApproved || item?.isApproved === undefined) && (
@@ -148,23 +167,44 @@ export default function ChallengeInfo({
               </div>
             </ModalLayout>
 
-            <ModalLayout size="sm" isOpen={show} onClose={() => setIsShow(false)} >
-              <div className=" flex flex-col gap-4 w-full " >
-                <div className=" w-full flex flex-col gap-2 items-center " >
-                  <div className=" w-12 h-12 rounded-full border-8 flex justify-center items-center bg-success-300 border-success-100 " >
-                    <IoCheckmarkCircle size={"20px"} className=" text-success-600 " />
-                  </div>
-                  <p className=" font-bold text-center " >Approve {capitalizeFLetter(item?.title)}</p>
-                  <p className=" text-xs font-medium text-center text-violet-300 " >{`Deleting this challenge will permanently remove all its tasks, resources, and participant progress. This action cannot be undone, so make sure you're certain before proceeding.`}</p>
-                </div>
-                <div className=" flex w-full flex-col gap-2 capitalize " >
-                  <CustomButton isLoading={loading} onClick={() => handleClick("approve")}  >Approve {textLimit(item?.title, 20)}</CustomButton>
-                  <CustomButton onClick={() => setIsShow(false)} variant="outline" >Cancel</CustomButton>
-                </div>
-              </div>
-            </ModalLayout>
           </div>
         )}
+
+
+<ModalLayout size="sm" isOpen={show} onClose={() => setIsShow(false)} >
+              <>
+                {!approve && (
+                  <div className=" flex flex-col gap-4 w-full " >
+                    <div className=" w-full flex flex-col gap-2 items-center " >
+                      <div className=" w-12 h-12 rounded-full border-8 flex justify-center items-center bg-success-300 border-success-100 " >
+                        <IoCheckmarkCircle size={"20px"} className=" text-success-600 " />
+                      </div>
+                      <p className=" font-bold text-center " >Approve Coach Payment</p>
+                      <p className=" text-xs font-medium text-center text-violet-300 " >{`This action cannot be undone, so make sure you're certain before proceeding.`}</p>
+                    </div>
+                    <div className=" flex w-full flex-col gap-2 capitalize " >
+                      <CustomButton isLoading={loading} onClick={() => coachPaymentMutation?.mutate(item?._id)}  >Approve</CustomButton>
+                      <CustomButton onClick={() => setIsShow(false)} variant="outline" >Cancel</CustomButton>
+                    </div>
+                  </div>
+                )}
+                {approve && (
+                  <div className=" flex flex-col gap-4 w-full " >
+                    <div className=" w-full flex flex-col gap-2 items-center " >
+                      <div className=" w-12 h-12 rounded-full border-8 flex justify-center items-center bg-success-300 border-success-100 " >
+                        <IoCheckmarkCircle size={"20px"} className=" text-success-600 " />
+                      </div>
+                      <p className=" font-bold text-center " >Approve {capitalizeFLetter(item?.title)}</p>
+                      <p className=" text-xs font-medium text-center text-violet-300 " >{`Deleting this challenge will permanently remove all its tasks, resources, and participant progress. This action cannot be undone, so make sure you're certain before proceeding.`}</p>
+                    </div>
+                    <div className=" flex w-full flex-col gap-2 capitalize " >
+                      <CustomButton isLoading={loading} onClick={() => handleClick("approve")}  >Approve {textLimit(item?.title, 20)}</CustomButton>
+                      <CustomButton onClick={() => setIsShow(false)} variant="outline" >Cancel</CustomButton>
+                    </div>
+                  </div>
+                )}
+              </>
+            </ModalLayout>
       </div>
     </div>
   );

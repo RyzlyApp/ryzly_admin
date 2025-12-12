@@ -64,10 +64,10 @@ export default function ChallengesTable() {
                                             <Avatar
                                                 className="w-8 h-8 text-xs"
                                                 src={item?.creator?.profilePicture}
-                                                name={item?.creator?.fullName}
+                                                name={item?.creator?.firstName}
                                             />
                                         </div>
-                                        <p className=" text-sm font-medium text-left " >{item?.creator?.fullName}</p>
+                                        <p className=" text-sm font-medium text-left " >{item?.creator?.firstName} {item?.creator?.lastName}</p>
                                     </div>
                                 </TableCell>
                                 <TableCell className="py-4 px-6 text-sm text-gray-900">
