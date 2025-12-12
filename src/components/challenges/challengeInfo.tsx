@@ -100,7 +100,7 @@ export default function ChallengeInfo({
             </span>
           </p>
         </div>
-        {(!approve && item?.IsEnded && !item?.isCreatorPaid)&& (
+        {(!approve && !item?.isCreatorPaid)&& (
           <div className=" w-[300px] px-4 " > 
             <CustomButton
               variant="primary"
