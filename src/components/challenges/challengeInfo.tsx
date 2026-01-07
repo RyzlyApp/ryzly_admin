@@ -91,8 +91,7 @@ export default function ChallengeInfo({
           <div
             className=" text-xs font-medium text-violet-300 "
             dangerouslySetInnerHTML={{ __html: item?.description }}
-          />
-          {/* <p className=" text-violet-300 text-sm font-medium " >{item?.description}</p> */}
+          /> 
           <p className=" text-violet-300 text-xs font-medium ">
             Participation Fee:{" "}
             <span className=" font-bold ">
