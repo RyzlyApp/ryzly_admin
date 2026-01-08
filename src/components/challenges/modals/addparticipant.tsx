@@ -32,7 +32,7 @@ export default function Addparticipant() {
                     <Avatar src={item?.profilePicture} name={item?.firstName} />
                     <div className=" flex flex-col " >
                         <p className=" font-medium text-sm " >{item?.firstName+" "+item?.lastName}</p>
-                        <p className=" font-medium text-xs " >{item?.firstName+" "+item?.lastName}</p>
+                        <p className=" font-medium text-xs " >{item?.username}</p>
                     </div>
                 </div>
                 <CustomButton onClick={() => handleSubmit(item?._id as string)} isLoading={addParticipantMutate?.isPending && index === item?._id} fontSize="12px" height="36px" >Invite</CustomButton>
