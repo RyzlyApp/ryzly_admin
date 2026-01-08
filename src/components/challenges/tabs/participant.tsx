@@ -2,14 +2,26 @@
 import { CustomSearch } from "@/components/custom";
 import UserCard from "@/components/shared/userCard";
 import { IChallenge } from "@/helper/model/challenge";
+import { RiAddLine } from "react-icons/ri";
+import { useState } from "react";
+import { ModalLayout } from "@/components/shared";
+import Addparticipant from "../modals/addparticipant";
 
 export default function Participant(
     { item }: { item: IChallenge }
 ) {
 
+    const [isOpen, setIsOpen] = useState(false)
+
     return (
         <div className=" w-full flex flex-col p-4 gap-4" >
             <CustomSearch placeholder="Search participants" />
+                <button onClick={() => setIsOpen(true)} className=" flex items-center gap-3 text-neonblue-600 " >
+                    <div className=" w-8 h-8 rounded-full flex justify-center items-center bg-neonblue-50 " >
+                        <RiAddLine size={"18px"} />
+                    </div>
+                    <p className=" text-sm font-medium " >Invite participants</p>
+                </button>
             <div className=" flex flex-col gap-3 " >
                 {item?.participants?.map((item, index) => {
                     return (
@@ -20,6 +32,9 @@ export default function Participant(
                     )
                 })}
             </div>
+            <ModalLayout title="Add a participant" isOpen={isOpen} onClose={() => setIsOpen(false)} >
+                <Addparticipant />
+            </ModalLayout>
         </div>
     )
 }
