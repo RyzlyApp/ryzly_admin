@@ -1,5 +1,5 @@
 export interface IUser {
-  badgeLevel: null | string;
+  badgeLevel: null | string[];
   createdAt: string;
   email: string;
   interets: string[];
@@ -20,4 +20,13 @@ export interface IUser {
   _id: string;
   firstName: string;
   lastName: string;
+  tiktokUsername?: string;
+  totalChallengesCreated?: number;
+  totalChallengesJoined?: number;
+  totalPrizesWon?: number;
+  twitterUsername?: string;
+  walletBalance?: number;
+  coachTotalEarnings?: number;
+  facebookUsername?: string;
+  LinkedinUsername?: string;
 }

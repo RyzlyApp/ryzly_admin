@@ -5,6 +5,7 @@ import { RiLinkedinFill, RiGlobalLine } from "react-icons/ri";
 import { BiCalendarEvent, BiMessage } from "react-icons/bi";
 import { HiLocationMarker } from "react-icons/hi";
 import { BsDot } from "react-icons/bs";
+import { useMemo } from "react";
 
 interface User {
   id: string;
@@ -43,36 +44,32 @@ interface UserInfoProps {
 }
 
 export default function UserInfo({ user }: UserInfoProps) {
-  const defaultUser = {
-    bio: "Passionate UI/UX designer crafting intuitive and visually engaging digital experiences. Blending creativity with usability to turn ideas into seamless interfaces that delight and inspire.",
-    socialLinks: {
-      linkedin: "https://linkedin.com/in/ngozinamani",
-      website: "https://ngozinamani.com",
-    },
-    stats: {
-      totalEarnings: "$10K+",
-      prizeWon: "$1,000",
-      availableBalance: "$8,500",
-    },
-    skills: [
-      "Website Prototyping",
-      "User Experience",
-      "UX Wireframe",
-      "Figma",
-      "Adobe XD",
-    ],
-    challengeStats: {
-      joinedAsParticipant: 100,
-      joinedAsCoach: 26,
-      created: 15,
-    },
-    communityStats: {
-      joined: 100,
-      created: 26,
-    },
-  };
+  const userData = useMemo(() => {
+    const defaultUser = {
+      bio: user?.bio || "",
+      socialLinks: {
+        linkedin: user?.socialLinks?.linkedin || "",
+        website: user?.socialLinks?.website || "",
+      },
+      stats: {
+        totalEarnings: "$10K+",
+        prizeWon: "$1,000",
+        availableBalance: "$8,500",
+      },
+      skills: user?.skills || [],
+      challengeStats: {
+        joinedAsParticipant: 0,
+        joinedAsCoach: 0,
+        created: 0,
+      },
+      communityStats: {
+        joined: 0,
+        created: 0,
+      },
+    };
 
-  const userData = { ...defaultUser, ...user };
+    return { ...defaultUser, ...user };
+  }, [user]);
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
