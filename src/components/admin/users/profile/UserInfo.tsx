@@ -2,44 +2,14 @@
 import { Avatar, Chip } from "@heroui/react";
 import { CustomImage } from "@/components/custom";
 import { RiLinkedinFill, RiGlobalLine } from "react-icons/ri";
-import { BiCalendarEvent, BiMessage } from "react-icons/bi";
+import { BiCalendarEvent, BiMessage, BiPhone } from "react-icons/bi";
 import { HiLocationMarker } from "react-icons/hi";
 import { BsDot } from "react-icons/bs";
-
-interface User {
-  id: string;
-  name: string;
-  role: string;
-  email: string;
-  location: string;
-  joinedOn: string;
-  status: "Active" | "Banned";
-  avatar: string;
-  isCoach?: boolean;
-  bio?: string;
-  socialLinks?: {
-    linkedin?: string;
-    website?: string;
-  };
-  stats?: {
-    totalEarnings: string;
-    prizeWon: string;
-    availableBalance: string;
-  };
-  skills?: string[];
-  challengeStats?: {
-    joinedAsParticipant: number;
-    joinedAsCoach: number;
-    created: number;
-  };
-  communityStats?: {
-    joined: number;
-    created: number;
-  };
-}
+import { IUser } from "@/helper/model/user";
+import { dateFormat } from "@/helper/utils/dateFormat"; 
 
 interface UserInfoProps {
-  user: User;
+  user: IUser;
 }
 
 export default function UserInfo({ user }: UserInfoProps) {
@@ -72,19 +42,19 @@ export default function UserInfo({ user }: UserInfoProps) {
     },
   };
 
-  const userData = { ...defaultUser, ...user };
+  const userData = { ...user };
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
       {/* Profile Header */}
       <div className="">
         <Avatar
-          src={userData.avatar}
-          alt={userData.name}
+          src={userData.profilePicture}
+          alt={userData.firstName}
           className="w-24 h-24 mb-4"
         />
         <div className="flex items-center gap-2 mb-2">
-          <h2 className="text-xl font-bold text-gray-900">{userData.name}</h2>
+          <h2 className="text-xl font-bold text-gray-900">{userData.firstName+" "+userData?.lastName}</h2>
           {userData.isCoach && (
             <Chip color="primary" size="sm" variant="flat">
               Coach
@@ -93,23 +63,23 @@ export default function UserInfo({ user }: UserInfoProps) {
         </div>
         <div className="flex">
           <p className="text-xs text-gray-600 font-semibold">
-            @{userData.name.toLowerCase().replace(/\s+/g, "")}
+            @{userData.username.toLowerCase().replace(/\s+/g, "")}
           </p>
           <BsDot />
-          <p className="text-xs text-gray-600">{userData.role}</p>
+          {/* <p className="text-xs text-gray-600">{userData.role}</p> */}
         </div>
       </div>
 
       {/* Bio */}
       <div>
-        <p className="text-sm text-gray-700 leading-relaxed">{userData.bio}</p>
+        <p className="text-sm text-gray-700 leading-relaxed">{userData.about}</p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span>
             <HiLocationMarker />
           </span>
-          <span>{userData.location}</span>
+          <span>{userData.country}</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span>
@@ -119,17 +89,23 @@ export default function UserInfo({ user }: UserInfoProps) {
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span>
+            <BiPhone />
+          </span>
+          <span>{userData.phone}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <span>
             <BiCalendarEvent />
           </span>
-          <span>Joined {userData.joinedOn}</span>
+          <span>Joined {dateFormat(userData?.createdAt)}</span>
         </div>
       </div>
 
       {/* Social Links */}
       <div className="flex items-center gap-3">
-        {userData.socialLinks?.linkedin && (
+        {userData.LinkedinUsername && (
           <a
-            href={userData.socialLinks.linkedin}
+            href={userData.LinkedinUsername}
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-blue-600 transition-colors"
@@ -137,7 +113,7 @@ export default function UserInfo({ user }: UserInfoProps) {
             <RiLinkedinFill size={20} />
           </a>
         )}
-        {userData.socialLinks?.website && (
+        {/* {userData. && (
           <a
             href={userData.socialLinks.website}
             target="_blank"
@@ -146,7 +122,7 @@ export default function UserInfo({ user }: UserInfoProps) {
           >
             <RiGlobalLine size={20} />
           </a>
-        )}
+        )} */}
       </div>
 
       {/* Financial Summary */}
@@ -157,19 +133,22 @@ export default function UserInfo({ user }: UserInfoProps) {
         <div className="grid grid-cols-3 gap-2">
           <div>
             <p className="text-sm font-semibold text-gray-900">
-              {userData.stats?.totalEarnings}
+              {/* {userData.sta} */}
+              0
             </p>
             <p className="text-xs text-gray-600">Total earnings</p>
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-900">
-              {userData.stats?.prizeWon}
+              {/* {userData.stats?.prizeWon} */}
+              0
             </p>
             <p className="text-xs text-gray-600">Prize won</p>
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-900">
-              {userData.stats?.availableBalance}
+              {/* {userData.stats?.availableBalance} */}
+              0
             </p>
             <p className="text-xs text-gray-600">Available balance</p>
           </div>
@@ -195,19 +174,22 @@ export default function UserInfo({ user }: UserInfoProps) {
           <div className="flex justify-between">
             <p className="text-xs text-gray-600">Joined as participants</p>
             <p className="text-sm text-gray-900">
-              {userData.challengeStats?.joinedAsParticipant}
+              {/* {userData.challengeStats?.joinedAsParticipant} */}
+              0
             </p>
           </div>
           <div className="flex justify-between">
             <p className="text-xs text-gray-600">Joined as coach</p>
             <p className="text-sm text-gray-900">
-              {userData.challengeStats?.joinedAsCoach}
+              {/* {userData.challengeStats?.joinedAsCoach} */}
+              0
             </p>
           </div>
           <div className="flex justify-between">
             <p className="text-xs text-gray-600">Created</p>
             <p className="text-sm text-gray-900">
-              {userData.challengeStats?.created}
+              {/* {userData.challengeStats?.created} */}
+              0
             </p>
           </div>
         </div>
@@ -222,13 +204,15 @@ export default function UserInfo({ user }: UserInfoProps) {
           <div className="flex justify-between">
             <p className="text-xs text-gray-600">Joined</p>
             <p className="text-sm font-semibold text-gray-900">
-              {userData.communityStats?.joined}
+              {/* {userData.communityStats?.joined} */}
+              0
             </p>
           </div>
           <div className="flex justify-between">
             <p className="text-xs text-gray-600">Created</p>
             <p className="text-sm font-semibold text-gray-900">
-              {userData.communityStats?.created}
+              {/* {userData.communityStats?.created} */}
+              0
             </p>
           </div>
         </div>
