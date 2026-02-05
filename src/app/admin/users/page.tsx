@@ -84,10 +84,10 @@ export default function AdminUsers() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => <StatCard key={index} {...stat} />)}
       </div>
-      <div className="bg-white rounded-lg shadow-sm">
+      <div className="bg-white rounded-lg shadow-sm p-4">
         <UsersTableHeader sortBy={filter} setSortBy={(e) => setFilter(e)} />
         <UsersTable />
-        <UsersTablePagination />
+        {/* <UsersTablePagination /> */}
       </div>
     </div>
   );

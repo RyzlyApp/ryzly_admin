@@ -4,6 +4,8 @@ import CustomButton from "@/components/custom/customButton";
 import { BsArrowLeft } from "react-icons/bs";
 import UserInfo from "./UserInfo";
 import ActivityTabs from "./ActivityTabs";
+import { useParams } from "next/navigation";
+import { IUser } from "@/helper/model/user";
 
 interface User {
   id: string;
@@ -38,11 +40,12 @@ interface User {
 }
 
 interface UserProfileProps {  
-  user: User;
-  onBack: () => void;
+  user: IUser;
+  // onBack: () => void;
 }
 
-export default function UserProfile({ user, onBack }: UserProfileProps) {
+export default function UserProfile({ user }: UserProfileProps) {
+
   return (
     <div className="">
       <div className="">
@@ -51,7 +54,7 @@ export default function UserProfile({ user, onBack }: UserProfileProps) {
             <UserInfo user={user} />
           </div>
           <div className="lg:col-span-2">
-            <ActivityTabs userId={user.id} />
+            <ActivityTabs userId={user._id} />
           </div>
         </div>
       </div>
