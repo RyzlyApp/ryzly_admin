@@ -5,39 +5,7 @@ import { BsArrowLeft } from "react-icons/bs";
 import UserInfo from "./UserInfo";
 import ActivityTabs from "./ActivityTabs";
 import { useParams } from "next/navigation";
-import { IUser } from "@/helper/model/user";
-
-interface User {
-  id: string;
-  name: string;
-  role: string;
-  email: string;
-  location: string;
-  joinedOn: string;
-  status: "Active" | "Banned";
-  avatar: string;
-  isCoach?: boolean;
-  bio?: string;
-  socialLinks?: {
-    linkedin?: string;
-    website?: string;
-  };
-  stats?: {
-    totalEarnings: string;
-    prizeWon: string;
-    availableBalance: string;
-  };
-  skills?: string[];
-  challengeStats?: {
-    joinedAsParticipant: number;
-    joinedAsCoach: number;
-    created: number;
-  };
-  communityStats?: {
-    joined: number;
-    created: number;
-  };
-}
+import { IUser } from "@/helper/model/user"; 
 
 interface UserProfileProps {  
   user: IUser;
@@ -54,7 +22,7 @@ export default function UserProfile({ user }: UserProfileProps) {
             <UserInfo user={user} />
           </div>
           <div className="lg:col-span-2">
-            <ActivityTabs userId={user._id} />
+            <ActivityTabs userId={user} />
           </div>
         </div>
       </div>
