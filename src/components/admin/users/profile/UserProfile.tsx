@@ -1,10 +1,6 @@
-"use client";
-import { useState } from "react";
-import CustomButton from "@/components/custom/customButton";
-import { BsArrowLeft } from "react-icons/bs";
+"use client"; 
 import UserInfo from "./UserInfo";
-import ActivityTabs from "./ActivityTabs";
-import { useParams } from "next/navigation";
+import ActivityTabs from "./ActivityTabs"; 
 import { IUser } from "@/helper/model/user"; 
 
 interface UserProfileProps {  
