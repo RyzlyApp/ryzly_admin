@@ -5,6 +5,10 @@ import Certificates from "./tabs/certificates";
 import Badges from "./tabs/badges"; 
 import Work from "./tabs/Work";
 import { IUser } from "@/helper/model/user";
+import PayoutRequestTab from "./tabs/PayoutRequestTab";
+import FinancialHistoryTab from "./tabs/FinancialHistoryTab";
+import ReportsTab from "./tabs/ReportsTab";
+import WorkTab from "./tabs/WorkTab";
 
 interface ActivityTabsProps {
   userId: IUser;
@@ -33,14 +37,14 @@ export default function ActivityTabs({ userId }: ActivityTabsProps) {
         return <Badges user={userId as IUser} />;
       case "challenges":
         return <ChallengesTab userId={userId._id as string} />;
-      // case "payout-request":
-      //   return <PayoutRequestTab userId={userId._id as string} />;
-      // case "financial-history":
-      //   return <FinancialHistoryTab userId={userId} />;
-      // case "reports":
-      //   return <ReportsTab userId={userId} />;
-      // default:
-      //   return <WorkTab userId={userId} />;
+      case "payout-request":
+        return <PayoutRequestTab userId={userId._id as string} />;
+      case "financial-history":
+        return <FinancialHistoryTab userId={userId._id as string} />;
+      case "reports":
+        return <ReportsTab userId={userId._id as string} />;
+      default:
+        return <WorkTab userId={userId._id as string} />;
     }
   };
 
