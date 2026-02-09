@@ -49,13 +49,13 @@ export default function UserInfo({ user }: UserInfoProps) {
       {/* Profile Header */}
       <div className="">
         <Avatar
-          src={userData.profilePicture}
-          alt={userData.firstName}
+          src={userData?.profilePicture}
+          alt={userData?.firstName}
           className="w-24 h-24 mb-4"
         />
         <div className="flex items-center gap-2 mb-2">
-          <h2 className="text-xl font-bold text-gray-900">{userData.firstName+" "+userData?.lastName}</h2>
-          {userData.isCoach && (
+          <h2 className="text-xl font-bold text-gray-900">{userData?.firstName+" "+userData?.lastName}</h2>
+          {userData?.isCoach && (
             <Chip color="primary" size="sm" variant="flat">
               Coach
             </Chip>
@@ -63,35 +63,35 @@ export default function UserInfo({ user }: UserInfoProps) {
         </div>
         <div className="flex">
           <p className="text-xs text-gray-600 font-semibold">
-            @{userData.username.toLowerCase().replace(/\s+/g, "")}
+            @{userData?.username?.toLowerCase().replace(/\s+/g, "")}
           </p>
           <BsDot />
-          {/* <p className="text-xs text-gray-600">{userData.role}</p> */}
+          {/* <p className="text-xs text-gray-600">{userData?.role}</p> */}
         </div>
       </div>
 
       {/* Bio */}
       <div>
-        <p className="text-sm text-gray-700 leading-relaxed">{userData.about}</p>
+        <p className="text-sm text-gray-700 leading-relaxed">{userData?.about}</p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span>
             <HiLocationMarker />
           </span>
-          <span>{userData.country}</span>
+          <span>{userData?.country}</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span>
             <BiMessage />
           </span>
-          <span>{userData.email}</span>
+          <span>{userData?.email}</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span>
             <BiPhone />
           </span>
-          <span>{userData.phone}</span>
+          <span>{userData?.phone}</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span>
@@ -103,26 +103,16 @@ export default function UserInfo({ user }: UserInfoProps) {
 
       {/* Social Links */}
       <div className="flex items-center gap-3">
-        {userData.LinkedinUsername && (
+        {userData?.LinkedinUsername && (
           <a
-            href={userData.LinkedinUsername}
+            href={userData?.LinkedinUsername}
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-blue-600 transition-colors"
           >
             <RiLinkedinFill size={20} />
           </a>
-        )}
-        {/* {userData. && (
-          <a
-            href={userData.socialLinks.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-400 hover:text-blue-600 transition-colors"
-          >
-            <RiGlobalLine size={20} />
-          </a>
-        )} */}
+        )} 
       </div>
 
       {/* Financial Summary */}
@@ -133,21 +123,21 @@ export default function UserInfo({ user }: UserInfoProps) {
         <div className="grid grid-cols-3 gap-2">
           <div>
             <p className="text-sm font-semibold text-gray-900">
-              {/* {userData.sta} */}
+              {/* {userData?.sta} */}
               0
             </p>
             <p className="text-xs text-gray-600">Total earnings</p>
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-900">
-              {/* {userData.stats?.prizeWon} */}
+              {/* {userData?.stats?.prizeWon} */}
               0
             </p>
             <p className="text-xs text-gray-600">Prize won</p>
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-900">
-              {/* {userData.stats?.availableBalance} */}
+              {/* {userData?.stats?.availableBalance} */}
               0
             </p>
             <p className="text-xs text-gray-600">Available balance</p>
@@ -159,7 +149,7 @@ export default function UserInfo({ user }: UserInfoProps) {
       <div>
         <h3 className="text-sm font-semibold text-gray-900 mb-3">Skills</h3>
         <div className="flex flex-wrap gap-2">
-          {userData.skills?.map((skill, index) => (
+          {userData?.skills?.map((skill, index) => (
             <Chip key={index} size="sm" variant="flat" className="text-xs">
               {skill}
             </Chip>
@@ -174,21 +164,21 @@ export default function UserInfo({ user }: UserInfoProps) {
           <div className="flex justify-between">
             <p className="text-xs text-gray-600">Joined as participants</p>
             <p className="text-sm text-gray-900">
-              {/* {userData.challengeStats?.joinedAsParticipant} */}
+              {/* {userData?.challengeStats?.joinedAsParticipant} */}
               0
             </p>
           </div>
           <div className="flex justify-between">
             <p className="text-xs text-gray-600">Joined as coach</p>
             <p className="text-sm text-gray-900">
-              {/* {userData.challengeStats?.joinedAsCoach} */}
+              {/* {userData?.challengeStats?.joinedAsCoach} */}
               0
             </p>
           </div>
           <div className="flex justify-between">
             <p className="text-xs text-gray-600">Created</p>
             <p className="text-sm text-gray-900">
-              {/* {userData.challengeStats?.created} */}
+              {/* {userData?.challengeStats?.created} */}
               0
             </p>
           </div>
@@ -204,14 +194,14 @@ export default function UserInfo({ user }: UserInfoProps) {
           <div className="flex justify-between">
             <p className="text-xs text-gray-600">Joined</p>
             <p className="text-sm font-semibold text-gray-900">
-              {/* {userData.communityStats?.joined} */}
+              {/* {userData?.communityStats?.joined} */}
               0
             </p>
           </div>
           <div className="flex justify-between">
             <p className="text-xs text-gray-600">Created</p>
             <p className="text-sm font-semibold text-gray-900">
-              {/* {userData.communityStats?.created} */}
+              {/* {userData?.communityStats?.created} */}
               0
             </p>
           </div>

@@ -1,16 +1,17 @@
 "use client";
-import { useState } from "react";
-import { Tabs, Tab } from "@heroui/react";
-import WorkTab from "./tabs/WorkTab";
-import CertificatesTab from "./tabs/CertificatesTab";
+import { useState } from "react"; 
+import ChallengesTab from "./tabs/ChallengesTab";
+import Certificates from "./tabs/certificates";
+import Badges from "./tabs/badges"; 
+import Work from "./tabs/Work";
+import { IUser } from "@/helper/model/user";
 import PayoutRequestTab from "./tabs/PayoutRequestTab";
 import FinancialHistoryTab from "./tabs/FinancialHistoryTab";
 import ReportsTab from "./tabs/ReportsTab";
-import BadgesTab from "./tabs/BadgesTab";
-import ChallengesTab from "./tabs/ChallengesTab";
+import WorkTab from "./tabs/WorkTab";
 
 interface ActivityTabsProps {
-  userId: string;
+  userId: IUser;
 }
 
 export default function ActivityTabs({ userId }: ActivityTabsProps) {
@@ -29,21 +30,21 @@ export default function ActivityTabs({ userId }: ActivityTabsProps) {
   const renderTabContent = () => {
     switch (activeTab) {
       case "work":
-        return <WorkTab userId={userId} />;
+        return <Work userId={userId._id as string} />;
       case "certificates":
-        return <CertificatesTab userId={userId} />;
+        return <Certificates userId={userId._id as string} />;
       case "badges":
-        return <BadgesTab userId={userId} />;
+        return <Badges user={userId as IUser} />;
       case "challenges":
-        return <ChallengesTab userId={userId} />;
+        return <ChallengesTab userId={userId._id as string} />;
       case "payout-request":
-        return <PayoutRequestTab userId={userId} />;
+        return <PayoutRequestTab userId={userId._id as string} />;
       case "financial-history":
-        return <FinancialHistoryTab userId={userId} />;
+        return <FinancialHistoryTab userId={userId._id as string} />;
       case "reports":
-        return <ReportsTab userId={userId} />;
+        return <ReportsTab userId={userId._id as string} />;
       default:
-        return <WorkTab userId={userId} />;
+        return <WorkTab userId={userId._id as string} />;
     }
   };
 
