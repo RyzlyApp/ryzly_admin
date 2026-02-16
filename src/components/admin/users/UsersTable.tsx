@@ -24,6 +24,8 @@ import { useRouter } from "next/navigation";
 import { IPagination } from "@/helper/model/pagination";
 import { useFetchData } from "@/hook/useFetchData";
 import UserCard from "@/components/shared/userCard";
+import { useAtom } from "jotai";
+import { searchAtom } from "@/helper/atom/search";
 
 const UsersTable: React.FC = ({}) => {
     // const {
@@ -74,6 +76,8 @@ const UsersTable: React.FC = ({}) => {
     const [userData, setUserData] = useState<IUser[]>([]);
     const [page, setPage] = useState(1);
 
+    const [ q ] = useAtom(searchAtom)
+
     const { data, isLoading } = useFetchData<IPagination<IUser[]>>({
         name: "challenge",
         endpoint: "/admin-user",
@@ -81,6 +85,7 @@ const UsersTable: React.FC = ({}) => {
         params: {
             limit: 10,
             page: page,
+            q
         },
     });
 
