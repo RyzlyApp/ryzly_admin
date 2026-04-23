@@ -2,9 +2,7 @@
 import React, { useState } from "react";
 import StatCard, { StatCardProps } from "@/components/admin/users/StatCard";
 import UsersTableHeader from "@/components/admin/users/UsersTableHeader";
-import UsersTable from "@/components/admin/users/UsersTable";
-import UsersTablePagination from "@/components/admin/users/UsersTablePagination";
-import UserProfile from "@/components/admin/users/profile/UserProfile";
+import UsersTable from "@/components/admin/users/UsersTable"; 
 import { TbUsers } from "react-icons/tb";
 import { RiOrganizationChart } from "react-icons/ri";
 import { BsFileText } from "react-icons/bs";
