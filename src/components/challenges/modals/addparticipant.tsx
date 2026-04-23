@@ -23,8 +23,6 @@ export default function Addparticipant() {
 
     const { data, isLoading: loading } = useFetchData<IUser[]>({ endpoint: `/admin-user`, name: "userall", params: { q: search } })
 
-    console.log(data);
-
     const Card = ({ item }: { item: IUser }) => {
         return (
             <div className="  flex w-full items-center justify-between py-2 " >
@@ -42,7 +40,7 @@ export default function Addparticipant() {
 
     return (
         <div className=" w-full flex flex-col gap-4 " >
-            <CustomSearch value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search participants" />
+            <CustomSearch value={search} onChange={(e) => setSearch(e+"")} placeholder="Search participants" />
             <LoadingLayout loading={loading} >
                 <div className=" flex flex-col gap-3 max-h-[50vh] overflow-y-auto " >
                     {data?.map((item, index) => {
