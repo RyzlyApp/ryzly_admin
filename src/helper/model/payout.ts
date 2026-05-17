@@ -9,4 +9,5 @@ export interface IPayout {
     "status": string,
     "createdAt": string,
     "updatedAt": string, 
+    user?: IUser;
 }
