@@ -13,29 +13,30 @@ interface UserInfoProps {
 }
 
 export default function UserInfo({ user }: UserInfoProps) {
-  const userData = useMemo(() => {
-    const defaultUser = {
-      bio: user?.bio || "",
-      socialLinks: {
-        linkedin: user?.socialLinks?.linkedin || "",
-        website: user?.socialLinks?.website || "",
-      },
-      stats: {
-        totalEarnings: "$10K+",
-        prizeWon: "$1,000",
-        availableBalance: "$8,500",
-      },
-      skills: user?.skills || [],
-      challengeStats: {
-        joinedAsParticipant: 0,
-        joinedAsCoach: 0,
-        created: 0,
-      },
-      communityStats: {
-        joined: 0,
-        created: 0,
-      },
-    };
+  // const userData = useMemo(() => {
+  //   const defaultUser = {
+  //     bio: user?.bio || "",
+  //     socialLinks: {
+  //       linkedin: user?.socialLinks?.linkedin || "",
+  //       website: user?.socialLinks?.website || "",
+  //     },
+  //     stats: {
+  //       totalEarnings: "$10K+",
+  //       prizeWon: "$1,000",
+  //       availableBalance: "$8,500",
+  //     },
+  //     skills: user?.skills || [],
+  //     challengeStats: {
+  //       joinedAsParticipant: 0,
+  //       joinedAsCoach: 0,
+  //       created: 0,
+  //     },
+  //     communityStats: {
+  //       joined: 0,
+  //       created: 0,
+  //     },
+  //   };
+  // }
 
   const userData = { ...user };
 
@@ -203,5 +204,5 @@ export default function UserInfo({ user }: UserInfoProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }
