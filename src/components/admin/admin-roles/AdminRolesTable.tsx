@@ -49,11 +49,11 @@ export default function AdminRolesTable({
             <tr key={row.id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center gap-3">
-                  <img
+                  {/* <img
                     src={row.avatarUrl}
                     alt={row.name}
                     className="h-8 w-8 rounded-full object-cover"
-                  />
+                  /> */}
                   <span className="text-sm text-gray-900">{row.name}</span>
                 </div>
               </td>
