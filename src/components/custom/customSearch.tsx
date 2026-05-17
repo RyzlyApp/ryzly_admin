@@ -1,5 +1,7 @@
 "use client"
+import { searchAtom } from "@/helper/atom/search";
 import { Input } from "@heroui/react";
+import { useAtom } from "jotai";
 
 interface IProps {
     placeholder?: string
@@ -41,11 +43,14 @@ export const SearchIcon = (props: React.SVGProps<SVGSVGElement>) => {
 export default function SearchField(
     { placeholder, value, onChange, onClear } : IProps
 ) {
+
+    const [ q, setSearch ] = useAtom(searchAtom)
+
     return (
         <Input
             isClearable
-            value={value}
-            onChange={onChange} 
+            value={q}
+            onChange={(e) => setSearch(e.target.value)} 
             onClear={onClear}
             classNames={{
                 inputWrapper:

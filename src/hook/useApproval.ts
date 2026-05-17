@@ -173,9 +173,8 @@ const useApproval = () => {
 
             formik.setFieldValue("transferCode", data?.data?.data?.paystackRef?.transfer_code)
             formik.setFieldValue("payoutId", data?.data?.data?.payout?._id) 
-            
-        
-            setIsOpen(true) 
+
+            queryClient.invalidateQueries({queryKey: ["payout"] })
             addToast({
                 title: data?.data?.message === "Insufficient wallet balance; payout declined" ? "Error" : "Success",
                 description: data?.data?.message,
