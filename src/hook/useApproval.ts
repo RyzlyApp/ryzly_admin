@@ -19,6 +19,7 @@ const useApproval = () => {
             id: string,
             payload: {
                 status: string
+                reason?: string
             }
         }) => httpService.patch(`/application/admin/${data?.id}/status`, data?.payload),
         onError: (error: AxiosError) => {

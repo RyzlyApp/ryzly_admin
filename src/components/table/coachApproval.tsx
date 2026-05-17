@@ -2,7 +2,21 @@ import { IApplicationDetail } from "@/helper/model/application";
 import { dateFormat } from "@/helper/utils/dateFormat";
 import useApproval from "@/hook/useApproval";
 import { useFetchData } from "@/hook/useFetchData";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Avatar } from "@heroui/react";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Pagination,
+  Avatar,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@heroui/react";
 import { useEffect, useState } from "react";
 import { CustomButton } from "../custom";
 import { IPagination } from "@/helper/model/pagination";
@@ -14,6 +28,10 @@ export default function CoachApproval() {
 
     const [id, setId] = useState("")
     const [status, setStatus] = useState("")
+    const [showModal, setShowModal] = useState(false);
+    const [activeId, setActiveId] = useState('');
+    const [declineMessage, setDeclineMessage] = useState("");
+    const [declineMessageError, setDeclineMessageError] = useState("");
 
     const [coachData, setCoachData] = useState<IApplicationDetail[]>([])
     const [page, setPage] = useState(1)
@@ -32,10 +50,28 @@ export default function CoachApproval() {
         setId(item)
         setStatus(status)
 
-        approveCoachMutation.mutate({
+        if (status === "APPROVED") {
+           approveCoachMutation.mutate({
             id: item,
             payload: {
                 status: status
+            }
+        })
+          return;
+        }
+
+        setActiveId(item);
+        setDeclineMessage("");
+        setDeclineMessageError("");
+        setShowModal(true);
+    }
+
+    const handleRejection = () => {
+        approveCoachMutation.mutate({
+            id: activeId,
+            payload: {
+                status: status,
+                reason: declineMessage
             }
         })
     }
@@ -57,7 +93,7 @@ export default function CoachApproval() {
                         <TableColumn>NAME</TableColumn>
                         <TableColumn>Years Of Experience</TableColumn>
                         <TableColumn>Expertise</TableColumn>
-                        <TableColumn>FocusArea</TableColumn>
+                        {/* <TableColumn>FocusArea</TableColumn> */}
                         <TableColumn>LinkedIn Url</TableColumn>
                         <TableColumn>Portfolio Url</TableColumn>
                         <TableColumn>Date</TableColumn>
@@ -91,9 +127,9 @@ export default function CoachApproval() {
                                 <TableCell className="py-4 px-6 text-sm text-gray-900">
                                     {request?.expertise}
                                 </TableCell>
-                                <TableCell className="py-4 px-4 text-sm text-gray-900">
+                                {/* <TableCell className="py-4 px-4 text-sm text-gray-900">
                                     {request?.focusArea}
-                                </TableCell>
+                                </TableCell> */}
                                 <TableCell className="py-4 px-4 text-sm text-gray-900">
                                     <a target="_blank" className=" text-neonblue-600 " href={request?.linkedInUrl} >{textLimit(request?.linkedInUrl, 30)}</a>
                                 </TableCell>
@@ -154,6 +190,7 @@ export default function CoachApproval() {
                                             >
                                                 Approve
                                             </CustomButton>
+                                            
                                         </div>
                                     ) : (
                                         <span className={` text-sm ${request?.status === "DECLINED" ? " text-red-600  " : " text-green-600 "}font-medium `}>
@@ -170,6 +207,84 @@ export default function CoachApproval() {
                 <Pagination showControls initialPage={page} total={Math.ceil(Number(data?.total))}
                     onChange={(page) => setPage(page)} />
             </div>
+
+            <Modal
+                isOpen={showModal}
+                onOpenChange={(isOpen) => {
+                    if (!isOpen) {
+                        setShowModal(false);
+                        setActiveId("");
+                        setDeclineMessage("");
+                        setDeclineMessageError("");
+                    }
+                }}
+                size="lg"
+            >
+                <ModalContent>
+                    <ModalHeader className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">Reject Coach</h3>
+                    </ModalHeader>
+                    <ModalBody className="space-y-2">
+                        <div className="space-y-1">
+                            <label className="text-sm text-gray-700">
+                                Message to coach
+                            </label>
+                            <textarea
+                                value={declineMessage}
+                                onChange={(e) => {
+                                    setDeclineMessage(e.target.value);
+                                    if (declineMessageError) setDeclineMessageError("");
+                                }}
+                                placeholder="Write a short message explaining why this was rejected..."
+                                className="w-full min-h-28 px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            {declineMessageError && (
+                                <p className="text-xs text-red-600 font-medium">
+                                    {declineMessageError}
+                                </p>
+                            )}
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <div className="flex items-center justify-end gap-3 w-full">
+                            <CustomButton
+                                variant="outline"
+                                type="button"
+                                onClick={() => {
+                                   handleRejection();
+                                }}
+                            >
+                                Cancel
+                            </CustomButton>
+                            <CustomButton
+                                variant="customDanger"
+                                type="button"
+                                isLoading={loading && activeId === id && status === "DECLINED"}
+                                onClick={() => {
+                                    const message = declineMessage.trim();
+                                    if (!message) {
+                                        setDeclineMessageError("Message is required");
+                                        return;
+                                    }
+
+                                    setId(activeId);
+                                    setStatus("DECLINED");
+                                    approveCoachMutation.mutate({
+                                        id: activeId,
+                                        payload: { status: "DECLINED", reason: message },
+                                    });
+                                    setShowModal(false);
+                                    setActiveId("");
+                                    setDeclineMessage("");
+                                    setDeclineMessageError("");
+                                }}
+                            >
+                                Reject
+                            </CustomButton>
+                        </div>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </LoadingLayout>
     )
 }

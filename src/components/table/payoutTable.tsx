@@ -9,6 +9,7 @@ import { formatNumber } from "@/helper/utils/numberFormat";
 import { dateFormat } from "@/helper/utils/dateFormat";
 import { CustomButton } from "../custom";
 import useApproval from "@/hook/useApproval";
+import { IUser } from "@/helper/model/user";
 
 export default function PayoutTable() {
 
@@ -48,6 +49,16 @@ export default function PayoutTable() {
 
     console.log(formik.values);
 
+    const getName = (user: IUser | undefined) => {
+        if (!user) {
+            return "NIL"
+        }
+        if (user?.firstName && user?.lastName) {
+            return user?.firstName + " " + user?.lastName
+        }
+        return user?.fullName;
+    }
+
     return (
         <LoadingLayout loading={isLoading} lenght={data?.items?.length} >
             <div className="w-full flex flex-col gap-6 items-center">
@@ -63,7 +74,7 @@ export default function PayoutTable() {
                         {payoutData?.map((item, index) => {
                             return (
                                 <TableRow key={index}>
-                                    <TableCell>{item?.userId?.firstName + " " + item?.userId?.lastName}</TableCell>
+                                    <TableCell>{getName(item?.user)}</TableCell>
                                     <TableCell>{formatNumber(item?.amount)}</TableCell>
                                     <TableCell>{dateFormat(item?.createdAt)}</TableCell>
                                     <TableCell>
