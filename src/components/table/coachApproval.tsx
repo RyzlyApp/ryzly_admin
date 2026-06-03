@@ -1,3 +1,4 @@
+'use client'
 import { IApplicationDetail } from "@/helper/model/application";
 import { dateFormat } from "@/helper/utils/dateFormat";
 import useApproval from "@/hook/useApproval";
@@ -45,6 +46,13 @@ export default function CoachApproval() {
 
     const { isLoading: loading, approveCoachMutation } = useApproval()
 
+    const closeRejectModal = () => {
+        setShowModal(false);
+        setActiveId("");
+        setDeclineMessage("");
+        setDeclineMessageError("");
+    }
+
     const handleClick = (item: string, status: "APPROVED" | "DECLINED") => {
 
         setId(item)
@@ -66,18 +74,9 @@ export default function CoachApproval() {
         setShowModal(true);
     }
 
-    const handleRejection = () => {
-        approveCoachMutation.mutate({
-            id: activeId,
-            payload: {
-                status: status,
-                reason: declineMessage
-            }
-        })
-    }
-
     useEffect(() => {
         if (Array.isArray(data?.data) && data?.data.length > 0) {
+            console.log('CoachApproval', data?.data);
             setCoachData(data.data as unknown as IApplicationDetail[]);
         } else {
             setCoachData([]);
@@ -101,9 +100,9 @@ export default function CoachApproval() {
                         <TableColumn>Action</TableColumn>
                     </TableHeader>
                     <TableBody>
-                        {coachData.map((request) => (
+                        {coachData.length > 0 ? coachData.map((request) => (
                             <TableRow
-                                key={request._id}
+                                key={request?._id}
                                 className="border-b border-gray-100 hover:bg-gray-50"
                             >
                                 <TableCell className="py-4 px-6">
@@ -111,13 +110,14 @@ export default function CoachApproval() {
                                         <div className=" w-fit " >
                                             <Avatar
                                                 className="w-8 h-8 text-xs"
-                                                name={request.user?.firstName}
+                                                name={request?.user?.firstName ?? request?.user?.fullName}
                                                 src={request?.user?.profilePicture}
                                                 color="primary"
                                             />
                                         </div>
                                         <span className="text-xs w-40 font-medium text-gray-900">
-                                            {request?.user?.firstName} {request?.user?.lastName}
+                                            {request?.user?.fullName ??
+                                                `${request?.user?.firstName ?? ""} ${request?.user?.lastName ?? ""}`.trim()}
                                         </span>
                                     </div>
                                 </TableCell>
@@ -131,18 +131,18 @@ export default function CoachApproval() {
                                     {request?.focusArea}
                                 </TableCell> */}
                                 <TableCell className="py-4 px-4 text-sm text-gray-900">
-                                    <a target="_blank" className=" text-neonblue-600 " href={request?.linkedInUrl} >{textLimit(request?.linkedInUrl, 30)}</a>
+                                    <a target="_blank" rel="noreferrer" className=" text-neonblue-600 " href={request?.linkedInUrl} >{textLimit(request?.linkedInUrl, 30)}</a>
                                 </TableCell>
                                 <TableCell className="py-4 px-4 text-sm text-gray-900">
-                                    <a target="_blank" className=" text-neonblue-600 " href={request?.portfolioUrl} >{textLimit(request?.portfolioUrl, 30)}</a>
+                                    <a target="_blank" rel="noreferrer" className=" text-neonblue-600 " href={request?.portfolioUrl} >{textLimit(request?.portfolioUrl, 30)}</a>
                                 </TableCell>
                                 <TableCell className="py-4 px-6 text-sm text-gray-900">
-                                    {dateFormat(request.createdAt)}
+                                    {dateFormat(request?.createdAt)}
                                 </TableCell>
                                 <TableCell className="py-4 px-6">
                                     <div className="flex items-center gap-2">
                                         <div
-                                            className={`w-2 h-2 rounded-full ${request.status === "PENDING"
+                                            className={`w-2 h-2 rounded-full ${request?.status === "PENDING"
                                                 ? "bg-gray-400" :
                                                 request?.status === "DECLINED" ?
                                                     " bg-red-500 "
@@ -150,12 +150,12 @@ export default function CoachApproval() {
                                                 }`}
                                         ></div>
                                         <span className="text-sm text-gray-600">
-                                            {request.status}
+                                            {request?.status}
                                         </span>
                                     </div>
                                 </TableCell>
                                 <TableCell className="py-4 px-6">
-                                    {request.status === "PENDING" ? (
+                                    {request?.status === "PENDING" ? (
                                         <div className=" flex gap-3 items-center " >
                                             <CustomButton
                                                 variant="primary"
@@ -178,7 +178,7 @@ export default function CoachApproval() {
                                                 Reject
                                             </CustomButton>
                                         </div>
-                                    ) : request.status === "DECLINED" ? (
+                                    ) : request?.status === "DECLINED" ? (
                                         <div className=" flex gap-3 items-center " >
                                             <CustomButton
                                                 variant="primary"
@@ -201,7 +201,13 @@ export default function CoachApproval() {
                                     )}
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        )) : (
+                            <TableRow>
+                                <TableCell colSpan={8} className="py-10 text-center text-sm text-gray-500">
+                                    No coach applications found
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
                 <Pagination showControls initialPage={page} total={Math.ceil(Number(data?.total))}
@@ -251,7 +257,7 @@ export default function CoachApproval() {
                                 variant="outline"
                                 type="button"
                                 onClick={() => {
-                                   handleRejection();
+                                   closeRejectModal();
                                 }}
                             >
                                 Cancel
@@ -273,10 +279,7 @@ export default function CoachApproval() {
                                         id: activeId,
                                         payload: { status: "DECLINED", reason: message },
                                     });
-                                    setShowModal(false);
-                                    setActiveId("");
-                                    setDeclineMessage("");
-                                    setDeclineMessageError("");
+                                    closeRejectModal();
                                 }}
                             >
                                 Reject
