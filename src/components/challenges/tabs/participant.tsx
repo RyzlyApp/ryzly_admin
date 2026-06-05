@@ -49,7 +49,6 @@ export default function Participant(
                         <div key={index} className=" w-full h-[60px] flex items-center justify-between" >
                             <div className="flex items-center gap-6">
                                 <UserCard item={item} showCoach={false} />
-                                {/* <CustomButtom height="40px" >Message</CustomButton> */}
                                 <Tooltip key={index} className="capitalize border-0" closeDelay={500} placement="right-start" color={"default"} content={"Remove Participant"} offset={7}>
                                     <Button className="border-none" color={"danger"} variant="light" isIconOnly onPress={() => mutate(item._id)}>
                                         <FaTrash />
