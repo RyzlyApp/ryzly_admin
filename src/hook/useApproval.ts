@@ -12,6 +12,7 @@ const useApproval = () => {
     const queryClient = useQueryClient()
 
     const [open, setIsOpen] = useState(false)
+    const [openEndChallenge, setIsOpenEndChallenge] = useState(false)
     const [show, setIsShow] = useState(false)  
 
     const approveCoachMutation = useMutation({
@@ -217,6 +218,36 @@ const useApproval = () => {
     });
 
 
+
+    const endChallengeMutation = useMutation({
+        mutationFn: (id: string) => httpService.post(`/challenge/process-organization-payouts/${id}`),
+        onError: (error: AxiosError) => {
+
+            const message =
+                (error?.response?.data as { message?: string })?.message ||
+                "Something went wrong";
+
+            addToast({
+                title: "Error",
+                description: message,
+                color: "danger",
+                timeout: 3000
+            })
+        },
+        onSuccess: (data) => {
+
+            queryClient.invalidateQueries({ queryKey: ["challengedetails"] }) 
+
+            setIsOpenEndChallenge(false) 
+            addToast({
+                title: "Success",
+                description: data?.data?.message,
+                color: "success",
+            })
+        },
+    });
+
+
     const formik = useFormik({
         initialValues: {
             otp: "", 
@@ -243,11 +274,14 @@ const useApproval = () => {
         approvePayoutMutation,
         verifyPayoutMutation,
         isLoading,
+        endChallengeMutation,
         open,
         show,
         coachPaymentMutation,
         setIsOpen,
         setIsShow, 
+        setIsOpenEndChallenge,
+        openEndChallenge,
         formik
     }
 }
