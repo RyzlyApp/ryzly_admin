@@ -19,6 +19,7 @@ export default function Participant(
 ) {
     const queryClient = useQueryClient();
     const [isOpen, setIsOpen] = useState(false)
+    const [search, setSearch] = useState("")
 
     const { mutate } = useMutation({
         mutationFn: (participant: string) =>
@@ -36,7 +37,7 @@ export default function Participant(
 
     return (
         <div className=" w-full flex flex-col p-4 gap-4" >
-            <CustomSearch placeholder="Search participants" />
+            <CustomSearch value={search} onChange={setSearch} placeholder="Search participants" />
             <button onClick={() => setIsOpen(true)} className=" flex items-center gap-3 text-neonblue-600 " >
                 <div className=" w-8 h-8 rounded-full flex justify-center items-center bg-neonblue-50 " >
                     <RiAddLine size={"18px"} />
