@@ -6,7 +6,7 @@ import { useAtom } from "jotai";
 interface IProps {
     placeholder?: string
     value?: string
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+    onChange: (e: string) => void
     onClear?: () => void; // optional external clear handler
 }
 
@@ -48,9 +48,8 @@ export default function SearchField(
 
     return (
         <Input
-            isClearable
-            value={q}
-            onChange={(e) => setSearch(e.target.value)} 
+            isClearable 
+            onChange={(e) => onChange(e.target.value)} 
             onClear={onClear}
             classNames={{
                 inputWrapper:
