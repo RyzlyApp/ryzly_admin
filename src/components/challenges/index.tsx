@@ -12,3 +12,8 @@ export { default as ReviewTab } from "./tabs/review"
   
 export { default as ChallengesDetailPage } from "./challengesDetailPage" 
 export { default as LeaveChallenge } from "./leaveChallenge" 
+
+export { default as TaskDetails } from "./tasks/details"
+export { default as SubmissionDetails } from "./tasks/submission"
+
+export { default as PreviewWork } from "./submission/previewWork"

@@ -26,7 +26,7 @@ export interface IChallenge {
     startDate: string,
     industry: IIndustry,
     participants: IUser[],
-    creator: IUser,
+    creator: string,
     coaches: Array<IUser>,
     createdAt: string,
     updatedAt: string,
