@@ -4,12 +4,13 @@ import { CustomButton, CustomInput } from "../custom";
 import { ISubmissionPreview } from "@/helper/model/application";
 import { useFetchData } from "@/hook/useFetchData";
 import { RiEditLine } from "react-icons/ri";
-import { IGradeDetail } from "@/helper/model/challenge";
+import { IChallenge, IGradeDetail } from "@/helper/model/challenge";
 import { CoachesReview, LoadingLayout, ModalLayout } from "../shared";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { userAtom } from "@/helper/atom/user";
 import useSubmitChallenge from "@/hook/useSubmitChallenge";
+import { useParams } from "next/navigation";
 
 export default function GradingChallenge({
     item,
@@ -17,8 +18,17 @@ export default function GradingChallenge({
     item: ISubmissionPreview;
 }) {
     const [tab, setTab] = useState(false);
+    const param = useParams();
+    const id = param.id;
 
     const [user] = useAtom(userAtom);
+
+    const { data:challenge, isLoading:loadingchallenge, isRefetching } = useFetchData<IChallenge>({
+        endpoint: `/challenge/single/${id}`, name: "challengedetails"
+    })
+
+    console.log(challenge);
+    
 
     const { data = [], isPending } = useFetchData<IGradeDetail[]>({
         endpoint: `/grade`,
@@ -43,11 +53,14 @@ export default function GradingChallenge({
         }
     }, [isPending, data]);
 
+    console.log(item);
+    
+
     useEffect(() => {
-        if (user?.data?.userType === "organization") {
+        if ((challenge?.creatorType)?.toLocaleLowerCase() === "organization") {
             formikGrade.setFieldValue("score", "100");
         }
-    }, [user?.data?.userType]);
+    }, [challenge?.creatorType]);
 
     return (
         <div className=" w-full lg:w-[400px] bg-white p-4 ">
@@ -66,7 +79,7 @@ export default function GradingChallenge({
                                     placeholder="Leave constructive feedback for this submission"
                                     textarea={true}
                                 />
-                                {user?.data?.userType !== "organization" && (
+                                {(challenge?.creatorType)?.toLocaleLowerCase() !== "organization" && (
                                     <CustomInput
                                         name="score"
                                         label="Score (/100%)"
@@ -90,14 +103,14 @@ export default function GradingChallenge({
                                         >
                                             Update
                                         </CustomButton>
-                                    ) : user?.data?.userType ===
+                                    ) : (challenge?.creatorType)?.toLocaleLowerCase() ===
                                       "organization" ? (
                                         <CustomButton
                                             isLoading={isLoading}
                                             type="button"
                                             onClick={() => setIsOpen(true)}
                                         >
-                                            {user?.data?.userType ===
+                                            {(challenge?.creatorType)?.toLocaleLowerCase() ===
                                             "organization"
                                                 ? "Approve"
                                                 : "Post"}
@@ -109,7 +122,7 @@ export default function GradingChallenge({
                                         >
                                             {data?.length > 0
                                                 ? "Update"
-                                                : user?.data?.userType ===
+                                                : (challenge?.creatorType)?.toLocaleLowerCase() ===
                                                     "organization"
                                                   ? "Approve"
                                                   : "Post"}

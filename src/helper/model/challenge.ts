@@ -10,6 +10,7 @@ export interface IChallenge {
     isPublic: boolean,
     title: string,
     description: string,
+    creatorType: string,
     winnerPrice: number,
     participationFee: number,
     isCreatorPaid: boolean,
