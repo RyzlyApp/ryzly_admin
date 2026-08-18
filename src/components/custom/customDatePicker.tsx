@@ -19,6 +19,7 @@ interface IProps {
   withTime?: boolean;
   defaultHour?: number;
   defaultMinute?: number;
+  disableMinValue?: boolean;
 }
 
 export default function CustomDateTimePicker({
@@ -28,6 +29,7 @@ export default function CustomDateTimePicker({
   withTime = true,
   defaultHour = 9,
   defaultMinute = 0,
+  disableMinValue,
 }: IProps) {
   const { errors, touched, setFieldValue, values } =
     useFormikContext<FormikValues>();
@@ -93,7 +95,7 @@ export default function CustomDateTimePicker({
       <DatePicker
         isDisabled={disabled}
         value={formikValue ?? undefined}
-        minValue={minValue}
+        minValue={disableMinValue ? undefined : minValue}
         granularity={withTime ? "minute" : "day"}
         hourCycle={12}
         classNames={{
