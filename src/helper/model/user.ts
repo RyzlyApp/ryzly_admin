@@ -18,9 +18,7 @@ export interface IUser {
     "lastName": string,
     "profilePicture": string,
     "track": string,
-    "country": string,
-    userType: string;
-    companyName: string;
+    "country": string, 
     "phone": string,
     "username": string,
     "challenges": IChallenge[],
@@ -29,9 +27,10 @@ export interface IUser {
     "instagramUsername": string,
     "LinkedinUsername": string,
     "tiktokUsername": string,
-    isSuspended: boolean
-    website: string
-}
+    isSuspended: boolean,
+    userType: string,
+    companyName: string
+} 
 
 // badgeLevel: null | string;
 // createdAt: string;

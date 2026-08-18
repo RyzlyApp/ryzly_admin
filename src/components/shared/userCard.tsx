@@ -16,10 +16,15 @@ export default function UserCard({ item, showCoach = true }: { item: IUser, show
             </div>
             <div className=" flex flex-col items-start " >
                 <div className=" flex items-center gap-1 " >
-                    <p className=" text-sm font-semibold " >{item?.firstName ? textLimit(item?.firstName + " " + item?.lastName, 15) : item?.fullName}</p>
+                    <p className=" text-sm font-semibold " >{item?.firstName ? textLimit(item?.firstName + " " + item?.lastName, 15) : item?.companyName ? item?.companyName : item?.fullName}</p>
                     {(showCoach && item?.isCoach) && (
                         <div className=" px-2 rounded-full bg-neonblue-600 text-white font-semibold h-[18px] flex justify-center items-center text-xs " >
                             Coach
+                        </div>
+                    )}
+                    {(item?.userType === "organization") && (
+                        <div className=" px-2 rounded-full bg-neonblue-600 text-white font-semibold h-[18px] flex justify-center items-center text-xs " >
+                            Organization
                         </div>
                     )}
                 </div> 
