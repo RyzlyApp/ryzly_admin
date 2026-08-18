@@ -1,18 +1,9 @@
 import React from 'react';
-import Image from 'next/image';
-
-interface Transaction {
-  id: string;
-  name: string;
-  avatar: string;
-  amount: number;
-  type: string;
-  date: string;
-  status: string;
-}
+import { ServerTransaction } from '@/app/admin/transactions/page';
+import { dateFormat } from '@/helper/utils/dateFormat';
 
 interface TransactionRowProps {
-  transaction: Transaction;
+  transaction: ServerTransaction;
   onClick: () => void;
 }
 
@@ -21,6 +12,7 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({ transaction, onC
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
       case 'successful':
+      case 'success':
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
             <span className="h-2 w-2 mr-1 rounded-full bg-green-400"></span>
@@ -51,38 +43,26 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({ transaction, onC
     }
   };
 
+  const formattedAmount = transaction.currencyType === "NGN" 
+    ? `₦${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
+    : `$${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
   return (
     <tr 
       className="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
       onClick={onClick}
     >
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center">
-          <div className="flex-shrink-0 h-10 w-10 relative">
-            <Image
-              className="h-10 w-10 rounded-full"
-              src={transaction.avatar}
-              alt={transaction.name}
-              width={40}
-              height={40}
-            />
-          </div>
-          <div className="ml-4">
-            <div className="text-sm font-medium text-gray-900">{transaction.name}</div>
-          </div>
-        </div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900">${transaction.amount.toFixed(2)}</div>
+        <div className="text-sm text-gray-900">{formattedAmount}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900">{transaction.type}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900">{transaction.id}</div>
+        <div className="text-sm text-gray-900">{transaction.reference || transaction._id}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900">{transaction.date}</div>
+        <div className="text-sm text-gray-900">{dateFormat(transaction.createdAt)}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         {getStatusBadge(transaction.status)}
