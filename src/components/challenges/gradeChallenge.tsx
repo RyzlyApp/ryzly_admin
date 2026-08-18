@@ -1,5 +1,5 @@
 "use client";
-import { FormikProvider } from "formik"; 
+import { FormikProvider } from "formik";
 import { CustomButton, CustomInput } from "../custom";
 import { ISubmissionPreview } from "@/helper/model/application";
 import { useFetchData } from "@/hook/useFetchData";
@@ -11,6 +11,7 @@ import { useAtom } from "jotai";
 import { userAtom } from "@/helper/atom/user";
 import useSubmitChallenge from "@/hook/useSubmitChallenge";
 import { useParams } from "next/navigation";
+import { addToast } from "@heroui/toast";
 
 export default function GradingChallenge({
     item,
@@ -19,16 +20,17 @@ export default function GradingChallenge({
 }) {
     const [tab, setTab] = useState(false);
     const param = useParams();
+    const [feedBackLoading, setfeedBackLoading] = useState(false);
     const id = param.id;
 
     const [user] = useAtom(userAtom);
 
-    const { data:challenge, isLoading:loadingchallenge, isRefetching } = useFetchData<IChallenge>({
+    const { data: challenge, isLoading: loadingchallenge, isRefetching } = useFetchData<IChallenge>({
         endpoint: `/challenge/single/${id}`, name: "challengedetails"
     })
 
     console.log(challenge);
-    
+
 
     const { data = [], isPending } = useFetchData<IGradeDetail[]>({
         endpoint: `/grade`,
@@ -54,13 +56,29 @@ export default function GradingChallenge({
     }, [isPending, data]);
 
     console.log(item);
-    
+
 
     useEffect(() => {
         if ((challenge?.creatorType)?.toLocaleLowerCase() === "organization") {
             formikGrade.setFieldValue("score", "100");
         }
     }, [challenge?.creatorType]);
+
+    const feedBack = async () => {
+        setfeedBackLoading(true)
+        await formikGrade.setFieldValue("score", "0");
+        if (!formikGrade.values.feedBack) {
+            addToast({
+                title: "Error",
+                description: "Enter A Feedback",
+                color: "danger",
+            })
+        } else {
+            formikGrade.setFieldValue("score", "0");
+            formikGrade.handleSubmit()
+        }
+        setfeedBackLoading(false)
+    }
 
     return (
         <div className=" w-full lg:w-[400px] bg-white p-4 ">
@@ -87,7 +105,7 @@ export default function GradingChallenge({
                                         type="number"
                                     />
                                 )}
-                                <div className=" w-full flex justify-end gap-4 pt-3 mt-auto ">
+                                {/* <div className=" w-full flex justify-end gap-4 pt-3 mt-auto ">
                                     {data?.length > 0 && (
                                         <CustomButton
                                             variant="outline"
@@ -128,7 +146,77 @@ export default function GradingChallenge({
                                                   : "Post"}
                                         </CustomButton>
                                     )}
-                                </div>
+                                </div> */}
+                                {(challenge?.creatorType)?.toLocaleLowerCase() === "organization" && (
+                                    <div className=" w-full flex justify-end gap-4 pt-3 mt-auto ">
+                                        <CustomButton
+                                            variant="outline"
+                                            onClick={() => setTab(true)}
+                                        >
+                                            Cancel
+                                        </CustomButton>
+                                        <CustomButton
+                                            isLoading={isLoading}
+                                            type={"submit"}
+                                        >
+                                            {data?.length > 0
+                                                ? "Update"
+                                                : (challenge?.creatorType)?.toLocaleLowerCase() ===
+                                                    "organization"
+                                                    ? "Approve"
+                                                    : "Post"}
+                                        </CustomButton>
+                                    </div>
+                                )}
+                                {(challenge?.creatorType)?.toLocaleLowerCase() !== "organization" && (
+                                    <div className=" w-full flex justify-end gap-4 pt-3 mt-auto ">
+                                        {data[0]?.score <= 0 && (
+                                            <CustomButton
+                                                variant="outline"
+                                                fullWidth
+                                                isLoading={isLoading && feedBackLoading}
+                                                onClick={feedBack}
+                                            >
+                                                Send Feedback Only
+                                            </CustomButton>
+                                        )}
+                                        {data?.length > 0 ? (
+                                            <CustomButton
+                                                isLoading={isLoading && !feedBackLoading}
+                                                type="submit"
+                                                fullWidth
+                                            >
+
+                                                {formikGrade?.values?.score === "0" ? "Approve as Winner" : "Update"}
+
+                                            </CustomButton>
+                                        ) : (challenge?.creatorType)?.toLocaleLowerCase() ===
+                                            "organization" ? (
+                                            <CustomButton
+                                                isLoading={isLoading && !feedBackLoading}
+                                                fullWidth
+                                                type="button"
+                                                onClick={() => setIsOpen(true)}
+                                            >
+                                                {"Approve as Winner"}
+                                            </CustomButton>
+                                        ) : (
+                                            <CustomButton
+                                                isLoading={isLoading && !feedBackLoading}
+                                                fullWidth
+                                                type={"submit"}
+                                            >
+                                                {data?.length > 0
+                                                    ? "Update"
+                                                    : (challenge?.creatorType)?.toLocaleLowerCase() ===
+                                                        "organization"
+                                                        ? "Approve"
+                                                        : "Post"}
+                                            </CustomButton>
+                                        )}
+                                    </div>
+                                )}
+                                <p className=" text-xs font-medium text-[#727272] " >Send Feedback won't approve this person as the winner unless you use the approve button.</p>
                             </div>
 
                             <ModalLayout
