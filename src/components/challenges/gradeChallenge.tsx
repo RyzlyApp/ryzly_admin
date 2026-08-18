@@ -147,7 +147,7 @@ export default function GradingChallenge({
                                         </CustomButton>
                                     )}
                                 </div> */}
-                                {(challenge?.creatorType)?.toLocaleLowerCase() === "organization" && (
+                                {(challenge?.creatorType)?.toLocaleLowerCase() !== "organization" && (
                                     <div className=" w-full flex justify-end gap-4 pt-3 mt-auto ">
                                         <CustomButton
                                             variant="outline"
@@ -168,7 +168,7 @@ export default function GradingChallenge({
                                         </CustomButton>
                                     </div>
                                 )}
-                                {(challenge?.creatorType)?.toLocaleLowerCase() !== "organization" && (
+                                {(challenge?.creatorType)?.toLocaleLowerCase() === "organization" && (
                                     <div className=" w-full flex justify-end gap-4 pt-3 mt-auto ">
                                         {data[0]?.score <= 0 && (
                                             <CustomButton
