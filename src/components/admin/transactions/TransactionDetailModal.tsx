@@ -7,22 +7,13 @@ import {
   ModalFooter,
 } from "@heroui/react";
 import CustomButton from "@/components/custom/customButton";
-import Image from "next/image";
-
-interface Transaction {
-  id: string;
-  name: string;
-  avatar: string;
-  amount: number;
-  type: string;
-  date: string;
-  status: string;
-}
+import { ServerTransaction } from "@/app/admin/transactions/page";
+import { dateFormat } from "@/helper/utils/dateFormat";
 
 interface TransactionDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  transaction: Transaction;
+  transaction: ServerTransaction;
 }
 
 export const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
@@ -30,6 +21,12 @@ export const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
   onClose,
   transaction,
 }) => {
+  const formattedAmount = transaction.currencyType === "NGN" 
+    ? `₦${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
+    : `$${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const normalizedStatus = transaction.status.toLowerCase();
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalContent>
@@ -40,25 +37,9 @@ export const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
         </ModalHeader>
         <ModalBody>
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="flex-shrink-0 h-10 w-10 relative">
-                  <Image
-                    className="h-10 w-10 rounded-full"
-                    src={transaction.avatar}
-                    alt={transaction.name}
-                    width={40}
-                    height={40}
-                  />
-                </div>
-                <div className="ml-4">
-                  <div className="text-sm font-medium text-gray-900">
-                    {transaction.name}
-                  </div>
-                </div>
-              </div>
-              <div className="text-lg font-semibold">
-                ${transaction.amount.toFixed(2)}
+            <div className="flex items-center justify-center py-4">
+              <div className="text-2xl font-bold text-gray-900">
+                {formattedAmount}
               </div>
             </div>
 
@@ -73,7 +54,7 @@ export const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
                 <div className="sm:grid sm:grid-cols-3 sm:gap-4">
                   <dt className="text-sm font-medium text-gray-500">Date</dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {transaction.date}
+                    {dateFormat(transaction.createdAt)}
                   </dd>
                 </div>
                 <div className="sm:grid sm:grid-cols-3 sm:gap-4">
@@ -81,28 +62,34 @@ export const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
                     Transaction ID
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {transaction.id}
+                    {transaction.reference || transaction._id}
                   </dd>
                 </div>
                 <div className="sm:grid sm:grid-cols-3 sm:gap-4">
                   <dt className="text-sm font-medium text-gray-500">Status</dt>
                   <dd className="mt-1 sm:mt-0 sm:col-span-2">
-                    {transaction.status === "Successful" && (
+                    {(normalizedStatus === "successful" || normalizedStatus === "success") && (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         <span className="h-2 w-2 mr-1 rounded-full bg-green-400"></span>
                         Successful
                       </span>
                     )}
-                    {transaction.status === "Failed" && (
+                    {normalizedStatus === "failed" && (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                         <span className="h-2 w-2 mr-1 rounded-full bg-red-400"></span>
                         Failed
                       </span>
                     )}
-                    {transaction.status === "Won" && (
+                    {normalizedStatus === "won" && (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         <span className="h-2 w-2 mr-1 rounded-full bg-blue-400"></span>
                         Won
+                      </span>
+                    )}
+                    {normalizedStatus !== "successful" && normalizedStatus !== "success" && normalizedStatus !== "failed" && normalizedStatus !== "won" && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        <span className="h-2 w-2 mr-1 rounded-full bg-gray-400"></span>
+                        {transaction.status}
                       </span>
                     )}
                   </dd>
