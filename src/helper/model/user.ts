@@ -18,7 +18,7 @@ export interface IUser {
     "lastName": string,
     "profilePicture": string,
     "track": string,
-    "country": string,
+    "country": string, 
     "phone": string,
     "username": string,
     "challenges": IChallenge[],
@@ -27,7 +27,9 @@ export interface IUser {
     "instagramUsername": string,
     "LinkedinUsername": string,
     "tiktokUsername": string,
-    isSuspended: boolean
+    isSuspended: boolean,
+    userType: string,
+    companyName: string
 } 
 
 // badgeLevel: null | string;
@@ -52,13 +54,13 @@ export interface IUser {
 // firstName: string;
 // lastName: string;
 
-export interface IProfile { 
-    "email"?: string,  
+export interface IProfile {
+    "email"?: string,
     "phone": string,
-    "country": string, 
+    "country": string,
     "username": string,
     "skills": Array<string>,
-    "interets": Array<string>, 
+    "interets": Array<string>,
     "about": string,
     "fullName": string,
     "profilePicture"?: string,

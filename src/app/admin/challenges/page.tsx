@@ -6,6 +6,9 @@ import ChallengesTableHeader from "@/components/admin/challenges/ChallengesTable
 import ChallengeInfo from "@/components/admin/challenges/ChallengeInfo";
 import { ChallengeTable } from "@/components/table";
 
+import { useAtom } from "jotai";
+import { challengesStatusFilterAtom, challengesHostTypeFilterAtom, challengesDateRangeFilterAtom } from "@/helper/atom/challenges";
+
 interface Challenge {
   id: string;
   title: string;
@@ -56,8 +59,9 @@ const mockChallenges: Challenge[] = [
 ];
 
 export default function AdminChallenges() {
-  const [coachFilter, setCoachFilter] = useState("All Coaches");
-  const [statusFilter, setStatusFilter] = useState("Ongoing");
+  const [hostTypeFilter, setHostTypeFilter] = useAtom(challengesHostTypeFilterAtom);
+  const [statusFilter, setStatusFilter] = useAtom(challengesStatusFilterAtom);
+  const [dateRangeFilter, setDateRangeFilter] = useAtom(challengesDateRangeFilterAtom);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(
     null
   );
@@ -82,10 +86,12 @@ export default function AdminChallenges() {
 
           <div className="bg-white rounded-lg shadow-sm mt-5">
             <ChallengesTableHeader
-              coachFilter={coachFilter}
-              setCoachFilter={setCoachFilter}
+              coachFilter={hostTypeFilter}
+              setCoachFilter={setHostTypeFilter}
               statusFilter={statusFilter}
               setStatusFilter={setStatusFilter}
+              dateRangeFilter={dateRangeFilter}
+              setDateRangeFilter={setDateRangeFilter}
             />
             <div className=" w-full p-4 flex flex-col " > 
             <ChallengeTable />
