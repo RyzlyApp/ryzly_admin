@@ -1,0 +1,41 @@
+"use client";
+import { PreviewWork } from "@/components/challenges";
+import GradingChallenge from "@/components/challenges/gradeChallenge"; 
+import { LoadingLayout } from "@/components/shared";
+import { ISubmissionPreview } from "@/helper/model/application";
+import { useFetchData } from "@/hook/useFetchData";
+import { useParams, useSearchParams } from "next/navigation";
+
+export default function Grading() {
+    const param = useParams();
+    const slug = param.slug;
+
+    const query = useSearchParams();
+    const userId = query?.get("userId");
+
+    const { data, isLoading } = useFetchData<Array<ISubmissionPreview>>({
+        endpoint: `/submission`,
+        params: {
+            // challengeID: id,
+            taskID: slug,
+            userId: userId,
+        },
+    });
+
+    return (
+        <>
+            <LoadingLayout loading={isLoading}>
+                {data && (
+                    <div className=" w-full flex lg:flex-row flex-col h-full gap-4 ">
+                        <div className=" h-full flex-1 overflow-y-auto rounded-2xl flex flex-col gap-6 bg-white p-4 ">
+                            {data?.length > 0 && <PreviewWork item={data[0]} />}
+                        </div>
+                        <div className=" w-full lg:w-fit ">
+                            <GradingChallenge item={data[0]} />
+                        </div>
+                    </div>
+                )}
+            </LoadingLayout>
+        </>
+    );
+}

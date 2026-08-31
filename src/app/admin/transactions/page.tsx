@@ -3,140 +3,49 @@
 import React, { useState } from "react";
 import { TransactionTable } from "@/components/admin/transactions/TransactionTable";
 import { TransactionDetailModal } from "@/components/admin/transactions/TransactionDetailModal"; 
-import CustomSelect from "@/components/custom/customSelect";
+import { CustomSelect } from "@/components/custom";
 import { Formik, Form } from "formik";
-import { DateRangePicker } from "@heroui/react";
+import { useFetchData } from "@/hook/useFetchData";
+import { LoadingLayout } from "@/components/shared";
+import { DatePicker } from "@heroui/react";
+import { DateValue, getLocalTimeZone } from "@internationalized/date";
 
-// Define Transaction type
-interface Transaction {
-  id: string;
-  name: string;
-  avatar: string;
-  amount: number;
+export interface ServerTransaction {
+  _id: string;
+  isDeleted: boolean;
   type: string;
-  date: string;
+  creatorType: string;
+  source: string;
+  flow: string;
+  typeId: string;
+  reference: string;
+  amount: number;
+  senderId: any;
+  currencyType: string;
   status: string;
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
 }
-
-// Mock transaction data
-const mockTransactions: Transaction[] = [
-  {
-    id: "WYRUF687498643",
-    name: "Albert Flores",
-    avatar: "/images/avatar1.png",
-    amount: 576.28,
-    type: "Deposit",
-    date: "25 Aug 2023",
-    status: "Failed",
-  },
-  {
-    id: "WYRUF687498643",
-    name: "Eleanor Pena",
-    avatar: "/images/avatar2.png",
-    amount: 787.5,
-    type: "Payout",
-    date: "25 Aug 2023",
-    status: "Successful",
-  },
-  {
-    id: "WYRUF687498643",
-    name: "Wade Warren",
-    avatar: "/images/avatar3.png",
-    amount: 782.71,
-    type: "Prize Won",
-    date: "25 Aug 2023",
-    status: "Won",
-  },
-  {
-    id: "WYRUF687498643",
-    name: "Darrell Steward",
-    avatar: "/images/avatar4.png",
-    amount: 105.55,
-    type: "Payout",
-    date: "25 Aug 2023",
-    status: "Successful",
-  },
-  {
-    id: "WYRUF687498643",
-    name: "Floyd Miles",
-    avatar: "/images/avatar5.png",
-    amount: 169.43,
-    type: "Prize Won",
-    date: "25 Aug 2023",
-    status: "Won",
-  },
-  {
-    id: "WYRUF687498643",
-    name: "Devon Lane",
-    avatar: "/images/avatar6.png",
-    amount: 202.87,
-    type: "Payout",
-    date: "25 Aug 2023",
-    status: "Won",
-  },
-  {
-    id: "WYRUF687498643",
-    name: "Cody Fisher",
-    avatar: "/images/avatar7.png",
-    amount: 233.01,
-    type: "Prize Won",
-    date: "25 Aug 2023",
-    status: "Won",
-  },
-  {
-    id: "WYRUF687498643",
-    name: "Bessie Cooper",
-    avatar: "/images/avatar8.png",
-    amount: 630.44,
-    type: "Payout",
-    date: "25 Aug 2023",
-    status: "Successful",
-  },
-  {
-    id: "WYRUF687498643",
-    name: "Jacob Jones",
-    avatar: "/images/avatar9.png",
-    amount: 295.84,
-    type: "Prize Won",
-    date: "25 Aug 2023",
-    status: "Won",
-  },
-  {
-    id: "WYRUF687498643",
-    name: "Arlene McCoy",
-    avatar: "/images/avatar10.png",
-    amount: 450.54,
-    type: "Deposit",
-    date: "25 Aug 2023",
-    status: "Successful",
-  },
-  {
-    id: "WYRUF687498643",
-    name: "Arlene McCoy",
-    avatar: "/images/avatar10.png",
-    amount: 275.43,
-    type: "Deposit",
-    date: "25 Aug 2023",
-    status: "Successful",
-  },
-];
 
 export default function TransactionsPage() {
   const [selectedTransaction, setSelectedTransaction] =
-    useState<Transaction | null>(null);
+    useState<ServerTransaction | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [transactionType, setTransactionType] = useState("All Transactions");
+  
+  // React state for HeroUI date pickers
+  const [startDate, setStartDate] = useState<DateValue | null>(null);
+  const [endDate, setEndDate] = useState<DateValue | null>(null);
 
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(mockTransactions.length / itemsPerPage);
+  const { data, isLoading } = useFetchData<ServerTransaction[]>({
+    name: "transactions",
+    endpoint: "/analytics/admin/transactions",
+  });
 
-  const paginatedTransactions = mockTransactions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const rawTransactions = data || [];
 
-  const handleTransactionClick = (transaction: Transaction) => {
+  const handleTransactionClick = (transaction: ServerTransaction) => {
     setSelectedTransaction(transaction);
     setIsModalOpen(true);
   };
@@ -146,61 +55,158 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg">
-      <div className="flex justify-between items-center mb-6">
-        <div className="w-48">
-          <Formik
-            initialValues={{ transactionType: transactionType }}
-            onSubmit={() => {}}
-          >
-            {({ values, setFieldValue }) => {
-              // Remove useEffect from here
-              if (values.transactionType !== transactionType) {
-                setTransactionType(values.transactionType);
-              }
+    <Formik
+      initialValues={{
+        typeFilter: "all",
+        flowFilter: "all",
+        statusFilter: "all",
+      }}
+      onSubmit={() => {}}
+    >
+      {({ values, resetForm }) => {
+        // Filter transactions based on Formik values and date range states
+        const filteredTransactions = rawTransactions.filter((tx) => {
+          if (values.typeFilter !== "all" && tx.type !== values.typeFilter) {
+            return false;
+          }
+          if (values.flowFilter !== "all" && tx.flow !== values.flowFilter) {
+            return false;
+          }
+          if (values.statusFilter !== "all" && tx.status !== values.statusFilter) {
+            return false;
+          }
+          if (startDate) {
+            const startJsDate = startDate.toDate(getLocalTimeZone());
+            startJsDate.setHours(0, 0, 0, 0);
+            if (!tx.createdAt || new Date(tx.createdAt).getTime() < startJsDate.getTime()) {
+              return false;
+            }
+          }
+          if (endDate) {
+            const endJsDate = endDate.toDate(getLocalTimeZone());
+            endJsDate.setHours(23, 59, 59, 999);
+            if (!tx.createdAt || new Date(tx.createdAt).getTime() > endJsDate.getTime()) {
+              return false;
+            }
+          }
+          return true;
+        });
 
-              return (
-                <Form>
-                  <CustomSelect
-                    name="transactionType"
-                    options={[
-                      { value: "All Transactions", label: "All Transactions" },
-                      { value: "Deposit", label: "Deposit" },
-                      { value: "Payout", label: "Payout" },
-                      { value: "Prize Won", label: "Prize Won" },
-                    ]}
-                    placeholder="Select transaction type"
-                  />
-                </Form>
-              );
-            }}
-          </Formik>
-        </div>
-{/* 
-        <div className="flex items-center">
-          <DateRangePicker
-            startDate={new Date("2025-01-06")}
-            endDate={new Date("2025-01-13")}
-            onChange={() => {}}
-          />
-        </div> */}
-      </div>
+        const itemsPerPage = 10;
+        const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+        const activePage = Math.min(currentPage, Math.max(1, totalPages));
 
-      <TransactionTable
-        transactions={paginatedTransactions}
-        onTransactionClick={handleTransactionClick}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+        const paginatedTransactions = filteredTransactions.slice(
+          (activePage - 1) * itemsPerPage,
+          activePage * itemsPerPage
+        );
 
-      {selectedTransaction && (
-        <TransactionDetailModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          transaction={selectedTransaction}
-        />
-      )}
-    </div>
+        return (
+          <div className="p-6 bg-white rounded-lg">
+            <Form className="flex flex-wrap items-end gap-4 mb-6">
+              {/* Type Select */}
+              <div className="w-48">
+                <CustomSelect
+                  name="typeFilter"
+                  label="Transaction Type"
+                  options={[
+                    { value: "all", label: "All Types" },
+                    { value: "DEPOSIT", label: "Deposit" },
+                    { value: "WITHDRAW", label: "Withdraw" },
+                    { value: "CHALLENGE_FEE", label: "Challenge Fee" },
+                    { value: "CHALLENGE_REWARD", label: "Challenge Reward" },
+                  ]}
+                  placeholder="Select type"
+                />
+              </div>
+
+              {/* Flow Select */}
+              <div className="w-40">
+                <CustomSelect
+                  name="flowFilter"
+                  label="Flow"
+                  options={[
+                    { value: "all", label: "All Flows" },
+                    { value: "INBOUND", label: "Inbound" },
+                    { value: "OUTBOUND", label: "Outbound" },
+                  ]}
+                  placeholder="Select flow"
+                />
+              </div>
+
+              {/* Status Select */}
+              <div className="w-40">
+                <CustomSelect
+                  name="statusFilter"
+                  label="Status"
+                  options={[
+                    { value: "all", label: "All Statuses" },
+                    { value: "SUCCESS", label: "Success" },
+                    { value: "FAILED", label: "Failed" },
+                    { value: "PENDING", label: "Pending" },
+                  ]}
+                  placeholder="Select status"
+                />
+              </div>
+
+              {/* Start Date picker (HeroUI) */}
+              <div className="w-48">
+                <DatePicker
+                  label="Start Date"
+                  value={startDate}
+                  onChange={setStartDate}
+                  className="w-full"
+                />
+              </div>
+
+              {/* End Date picker (HeroUI) */}
+              <div className="w-48">
+                <DatePicker
+                  label="End Date"
+                  value={endDate}
+                  onChange={setEndDate}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Reset Button */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetForm();
+                    setStartDate(null);
+                    setEndDate(null);
+                    setCurrentPage(1);
+                  }}
+                  style={{ height: "45px" }}
+                  className="px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl border border-gray-300 transition-colors duration-150 cursor-pointer"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            </Form>
+
+            <LoadingLayout loading={isLoading} lenght={filteredTransactions.length}>
+              <TransactionTable
+                transactions={paginatedTransactions}
+                onTransactionClick={handleTransactionClick}
+                currentPage={activePage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </LoadingLayout>
+
+            {selectedTransaction && (
+              <TransactionDetailModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                transaction={selectedTransaction}
+              />
+            )}
+          </div>
+        );
+      }}
+    </Formik>
   );
 }
