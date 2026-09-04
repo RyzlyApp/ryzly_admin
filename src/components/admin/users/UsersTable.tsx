@@ -76,26 +76,49 @@ const UsersTable: React.FC = ({}) => {
     const [userData, setUserData] = useState<IUser[]>([]);
     const [page, setPage] = useState(1);
 
-    const [ q ] = useAtom(searchAtom)
+    const [q] = useAtom(searchAtom);
+    const { filter } = useUsers();
+
+    // Reset page to 1 when search query or filter category changes
+    useEffect(() => {
+        setPage(1);
+    }, [filter, q]);
+
+    const params: Record<string, any> = {
+        limit: 10,
+        page: page,
+    };
+
+    if (q) {
+        params.q = q;
+    }
 
     const { data, isLoading } = useFetchData<IPagination<IUser[]>>({
-        name: "challenge",
+        name: "users",
         endpoint: "/admin-user",
         pagination: true,
-        params: {
-            limit: 10,
-            page: page,
-            q
-        },
+        params,
     });
+
+    console.log(data?.data);
 
     useEffect(() => {
         if (Array.isArray(data?.data) && data?.data.length > 0) {
-            setUserData(data.data as unknown as IUser[]);
+            let filtered = data.data as unknown as IUser[];
+
+            if (filter === "coach") {
+                filtered = filtered.filter(user => user.isCoach === true);
+            } else if (filter === "organization") {
+                filtered = filtered.filter(user => user.userType === "organization" || !!user.companyName);
+            } else if (filter === "talent") {
+                filtered = filtered.filter(user => user.userType === "learner" || (!user.isCoach && user.userType !== "organization" && !user.companyName));
+            }
+
+            setUserData(filtered);
         } else {
             setUserData([]);
         }
-    }, [data?.data, isLoading]);
+    }, [data?.data, isLoading, filter]);
 
     return (
         // <div className="overflow-x-auto">

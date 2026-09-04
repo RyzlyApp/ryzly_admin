@@ -9,6 +9,7 @@ import {
 import CustomButton from "@/components/custom/customButton";
 import { ServerTransaction } from "@/app/admin/transactions/page";
 import { dateFormat } from "@/helper/utils/dateFormat";
+import { FiArrowDown, FiArrowUp } from "react-icons/fi";
 
 interface TransactionDetailModalProps {
   isOpen: boolean;
@@ -49,6 +50,28 @@ export const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
                   <dt className="text-sm font-medium text-gray-500">Type</dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                     {transaction.type}
+                  </dd>
+                </div>
+                <div className="sm:grid sm:grid-cols-3 sm:gap-4">
+                  <dt className="text-sm font-medium text-gray-500">Flow</dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {transaction.flow ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        {transaction.flow.toUpperCase() === "INBOUND" ? (
+                          <>
+                            <FiArrowUp className="w-4 h-4 text-green-600" />
+                            <span className="font-medium text-green-700">Inbound</span>
+                          </>
+                        ) : (
+                          <>
+                            <FiArrowDown className="w-4 h-4 text-red-600" />
+                            <span className="font-medium text-red-700">Outbound</span>
+                          </>
+                        )}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
                   </dd>
                 </div>
                 <div className="sm:grid sm:grid-cols-3 sm:gap-4">

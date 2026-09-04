@@ -66,10 +66,6 @@ export default function AdminChallenges() {
     null
   );
 
-  const handleChallengeClick = (challenge: Challenge) => {
-    setSelectedChallenge(challenge);
-  };
-
   return (
     <div className="">
       {selectedChallenge ? (
