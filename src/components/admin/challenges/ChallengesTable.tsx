@@ -81,6 +81,7 @@ export default function ChallengesTable({
                       .join("")}
                     color="primary"
                   />
+                  
                   <span className="text-sm text-gray-900">
                     {challenge.host}
                   </span>

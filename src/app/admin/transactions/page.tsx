@@ -2,13 +2,11 @@
 
 import React, { useState } from "react";
 import { TransactionTable } from "@/components/admin/transactions/TransactionTable";
-import { TransactionDetailModal } from "@/components/admin/transactions/TransactionDetailModal"; 
-import { CustomSelect } from "@/components/custom";
+import { TransactionDetailModal } from "@/components/admin/transactions/TransactionDetailModal";
+import { CustomSelect, CustomDatePicker } from "@/components/custom";
 import { Formik, Form } from "formik";
 import { useFetchData } from "@/hook/useFetchData";
 import { LoadingLayout } from "@/components/shared";
-import { DatePicker } from "@heroui/react";
-import { DateValue, getLocalTimeZone } from "@internationalized/date";
 
 export interface ServerTransaction {
   _id: string;
@@ -33,10 +31,6 @@ export default function TransactionsPage() {
     useState<ServerTransaction | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  
-  // React state for HeroUI date pickers
-  const [startDate, setStartDate] = useState<DateValue | null>(null);
-  const [endDate, setEndDate] = useState<DateValue | null>(null);
 
   const { data, isLoading } = useFetchData<ServerTransaction[]>({
     name: "transactions",
@@ -60,11 +54,13 @@ export default function TransactionsPage() {
         typeFilter: "all",
         flowFilter: "all",
         statusFilter: "all",
+        startDate: "",
+        endDate: "",
       }}
       onSubmit={() => {}}
     >
       {({ values, resetForm }) => {
-        // Filter transactions based on Formik values and date range states
+        // Filter transactions based on Formik values
         const filteredTransactions = rawTransactions.filter((tx) => {
           if (values.typeFilter !== "all" && tx.type !== values.typeFilter) {
             return false;
@@ -75,15 +71,15 @@ export default function TransactionsPage() {
           if (values.statusFilter !== "all" && tx.status !== values.statusFilter) {
             return false;
           }
-          if (startDate) {
-            const startJsDate = startDate.toDate(getLocalTimeZone());
+          if (values.startDate) {
+            const startJsDate = new Date(values.startDate);
             startJsDate.setHours(0, 0, 0, 0);
             if (!tx.createdAt || new Date(tx.createdAt).getTime() < startJsDate.getTime()) {
               return false;
             }
           }
-          if (endDate) {
-            const endJsDate = endDate.toDate(getLocalTimeZone());
+          if (values.endDate) {
+            const endJsDate = new Date(values.endDate);
             endJsDate.setHours(23, 59, 59, 999);
             if (!tx.createdAt || new Date(tx.createdAt).getTime() > endJsDate.getTime()) {
               return false;
@@ -149,23 +145,23 @@ export default function TransactionsPage() {
                 />
               </div>
 
-              {/* Start Date picker (HeroUI) */}
+              {/* Start Date picker */}
               <div className="w-48">
-                <DatePicker
+                <CustomDatePicker
+                  name="startDate"
                   label="Start Date"
-                  value={startDate}
-                  onChange={setStartDate}
-                  className="w-full"
+                  withTime={false}
+                  disableMinValue={true}
                 />
               </div>
 
-              {/* End Date picker (HeroUI) */}
+              {/* End Date picker */}
               <div className="w-48">
-                <DatePicker
+                <CustomDatePicker
+                  name="endDate"
                   label="End Date"
-                  value={endDate}
-                  onChange={setEndDate}
-                  className="w-full"
+                  withTime={false}
+                  disableMinValue={true}
                 />
               </div>
 
@@ -175,8 +171,6 @@ export default function TransactionsPage() {
                   type="button"
                   onClick={() => {
                     resetForm();
-                    setStartDate(null);
-                    setEndDate(null);
                     setCurrentPage(1);
                   }}
                   style={{ height: "45px" }}

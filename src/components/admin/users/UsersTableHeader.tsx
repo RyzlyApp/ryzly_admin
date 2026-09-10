@@ -1,5 +1,8 @@
 import React from "react";
-import { RiArrowDownSLine } from "react-icons/ri";
+import { Select, SelectItem } from "@heroui/react";
+import { useAtom } from "jotai";
+import { searchAtom } from "@/helper/atom/search";
+import SearchField from "@/components/custom/customSearch";
 
 interface UsersTableHeaderProps {
   sortBy: string;
@@ -10,30 +13,45 @@ const UsersTableHeader: React.FC<UsersTableHeaderProps> = ({
   sortBy,
   setSortBy,
 }) => {
-
-  
+  const [q, setQ] = useAtom(searchAtom);
 
   return (
     <div className="p-6 border-b border-gray-200">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <h3 className="text-lg font-bold text-gray-900">Users</h3>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Sort by</span>
-          <div className="relative">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All</option>
-              <option value="coach">Coach</option>
-              <option value="active">Active</option>
-              <option value="banned">Banned</option>
-            </select>
-            <RiArrowDownSLine
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400"
-              size={16}
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="w-64">
+            <SearchField
+              placeholder="Search users..."
+              value={q}
+              onChange={(val) => setQ(val)}
+              onClear={() => setQ("")}
             />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600 font-medium">Filter by</span>
+            <div className="w-48">
+              <Select
+                aria-label="Filter users"
+                selectedKeys={sortBy ? [sortBy] : ["all"]}
+                disallowEmptySelection
+                onSelectionChange={(keys) => {
+                  const val = Array.from(keys)[0] as string;
+                  if (val) setSortBy(val);
+                }}
+                size="sm"
+                variant="bordered"
+                classNames={{
+                  trigger: "bg-white border border-gray-300 rounded-lg h-10 min-h-10 shadow-none",
+                  value: "text-sm text-gray-700 font-medium",
+                }}
+              >
+                <SelectItem key="all">All Users</SelectItem>
+                <SelectItem key="coach">Coach</SelectItem>
+                <SelectItem key="organization">Host/Organisation</SelectItem>
+                <SelectItem key="talent">Talents</SelectItem>
+              </Select>
+            </div>
           </div>
         </div>
       </div>
