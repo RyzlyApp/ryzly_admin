@@ -95,7 +95,6 @@ export default function AdminRolesPage() {
       <div className="bg-white rounded-lg shadow-sm">
         <AdminRolesHeader
           onAdd={() => setIsAddOpen(true)}
-          count={admins.length}
         />
         <LoadingLayout loading={isLoading} lenght={admins.length}>
           <AdminRolesTable

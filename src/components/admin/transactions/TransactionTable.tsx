@@ -85,6 +85,12 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
             >
               Type
             </th>
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Status
+            </th>
             {/* <th
               scope="col"
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -102,12 +108,6 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               Date
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Status
             </th>
           </tr>
         </thead>
@@ -192,11 +192,10 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                       onClick={() =>
                         typeof page === "number" && onPageChange(page)
                       }
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                        currentPage === page
+                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === page
                           ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
                           : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                      }`}
+                        }`}
                     >
                       {page}
                     </button>
