@@ -5,9 +5,10 @@ import { useFetchData } from "@/hook/useFetchData";
 import { dateFormatMonthDay } from "@/helper/utils/dateFormat";
 import { LoadingLayout } from "@/components/shared";
 import useApproval from "@/hook/useApproval";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { IChallenge } from "@/helper/model/challenge";
 import { CustomImage } from "@/components/custom";
+import ApprovalsTableHeader from "./ApprovalsTableHeader";
 
 interface ApprovalRequest {
     id: string;
@@ -23,6 +24,7 @@ export default function ChallengeTable() {
 
     const [id, setId] = useState("")
     const [status, setStatus] = useState("")
+    const [searchTerm, setSearchTerm] = useState("")
 
     const { data = [], isLoading } = useFetchData<IChallenge[]>({ name: "challenge", endpoint: "/challenge/status" });
 
@@ -45,10 +47,42 @@ export default function ChallengeTable() {
 
     }
 
+    const rawData = Array.isArray(data) ? data : [];
+
+    const filteredData = useMemo(() => {
+        if (!searchTerm.trim()) return rawData;
+        const term = searchTerm.toLowerCase().trim();
+        return rawData.filter((item) => {
+            const title = (item?.title || "").toLowerCase();
+            const firstName = (item?.creator?.firstName || "").toLowerCase();
+            const lastName = (item?.creator?.lastName || "").toLowerCase();
+            const fullName = `${firstName} ${lastName}`.trim();
+            const statusStr = (
+                item?.isApproved === undefined ? "pending" : !item?.isApproved ? "reject" : "approved"
+            ).toLowerCase();
+
+            return (
+                title.includes(term) ||
+                firstName.includes(term) ||
+                lastName.includes(term) ||
+                fullName.includes(term) ||
+                statusStr.includes(term)
+            );
+        });
+    }, [rawData, searchTerm]);
+
     return (
-        <LoadingLayout loading={isLoading} >
-            <div className="overflow-x-auto">
-                <table className="w-full">
+        <div className="w-full">
+            <ApprovalsTableHeader
+                title="Challenge Approvals"
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                placeholder="Search by title, host, or status..."
+                count={filteredData.length}
+            />
+            <LoadingLayout loading={isLoading} lenght={filteredData.length}>
+                <div className="overflow-x-auto">
+                    <table className="w-full">
                     <thead className="bg-gray-50">
                         <tr>
                             <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
@@ -69,7 +103,7 @@ export default function ChallengeTable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {data?.map((item) => (
+                        {filteredData?.map((item) => (
                             <tr
                                 key={item._id}
                                 className="border-b border-gray-100 hover:bg-gray-50"
@@ -152,5 +186,6 @@ export default function ChallengeTable() {
                 </table>
             </div>
         </LoadingLayout>
+        </div>
     );
 }

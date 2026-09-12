@@ -109,8 +109,11 @@ export default function TransactionsPage() {
                     { value: "all", label: "All Types" },
                     { value: "DEPOSIT", label: "Deposit" },
                     { value: "WITHDRAW", label: "Withdraw" },
+                    { value: "PRICE", label: "Price" },
+                    { value: "CHALLENGE", label: "Challenge" },
                     { value: "CHALLENGE_FEE", label: "Challenge Fee" },
                     { value: "CHALLENGE_REWARD", label: "Challenge Reward" },
+                    { value: "REJECTED", label: "Rejected" },
                   ]}
                   placeholder="Select type"
                 />
