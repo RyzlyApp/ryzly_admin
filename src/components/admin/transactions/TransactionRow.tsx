@@ -73,12 +73,12 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({ transaction, onC
     }
   };
 
-  const formattedAmount = transaction.currencyType === "NGN" 
-    ? `₦${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
+  const formattedAmount = transaction.currencyType === "NGN"
+    ? `₦${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     : `$${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
-    <tr 
+    <tr
       className="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
       onClick={onClick}
     >
@@ -87,6 +87,9 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({ transaction, onC
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900">{transaction.type}</div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        {getStatusBadge(transaction.status)}
       </td>
       {/* <td className="px-6 py-4 whitespace-nowrap">
         {getFlowBadge(transaction.flow)}
@@ -97,9 +100,7 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({ transaction, onC
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900">{dateFormat(transaction.createdAt)}</div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        {getStatusBadge(transaction.status)}
-      </td>
+
     </tr>
   );
 };
