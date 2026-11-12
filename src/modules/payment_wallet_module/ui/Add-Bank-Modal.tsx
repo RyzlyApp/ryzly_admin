@@ -1,0 +1,206 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import {
+  Modal,
+  ModalContent,
+  ModalBody,
+  useDisclosure,
+  Input,
+  addToast,
+  Button,
+  Spinner,
+  Select,
+  SelectItem,
+} from "@heroui/react";
+import usePaymentWalletHook from "../hooks/usePaymentWalletHook";
+import { ICreateAccountDto } from "../dto/create-account-dto";
+import { WALLET_TYPE } from "../dto/create-payment-dto";
+import httpService from "@/helper/services/httpService";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { handleError } from "@/helper/utils/hanlderAxoisError";
+// import { useFetchData } from "@/hook/useFetchData";
+// import { IGrade } from "@/helper/model/challenge";
+// import httpService from "@/helper/services/httpService";
+// import { useMutation } from "@tanstack/react-query";
+// import { AxiosError } from "axios";
+// import router from "next/router";
+
+function AddBankModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const [accountNumber, setAccountNumber] = React.useState("");
+  const [validatedAccount, setValidatedAccount] = useState<string | null>(null)
+  const query = useQueryClient()
+  const { getPaystackBanks, createAccount, getUserBanks } =
+    usePaymentWalletHook();
+  const [banks, setBanks] = React.useState<{ key: string; label: string }[]>(
+    []
+  );
+  const [value, setValue] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const checkAccount = useMutation({
+    mutationFn: (data: {
+      bankCode: string,
+      accountNumber: string
+    }) => httpService.post(`/wallet/banks/validate`, data),
+    onError: (error: AxiosError) => handleError(error),
+    onSuccess: (data) => {
+
+      console.log(data);
+      setValidatedAccount(data?.data?.data.accountName)
+
+      addToast({
+        title: "Success",
+        description: data?.data?.message,
+        color: "success",
+      })
+    },
+  });
+
+  React.useEffect(() => {
+    (async function () {
+      const response = await getPaystackBanks();
+      console.log(response);
+      const transfromedBanks = response?.data.map((bank) => ({
+        key: bank.code,
+        label: bank.name,
+      }));
+      setBanks(transfromedBanks || []);
+    })();
+  }, []);
+
+  const handleClick = async () => {
+    try {
+      if (!validatedAccount) {
+        addToast({
+          title: "Please validate your account number",
+          severity: "danger",
+          color: "danger",
+        });
+        return;
+      }
+      if (
+        accountNumber === "" ||
+        accountNumber.length < 10 ||
+        accountNumber.length > 10
+      ) {
+        addToast({
+          title: "Account number must be 10 digits",
+          severity: "danger",
+          color: "warning",
+        });
+        return;
+      }
+      if (value === "") {
+        addToast({
+          title: "Please select a bank",
+          severity: "danger",
+          color: "danger",
+        });
+        return;
+      }
+      const bank = banks.find((bank) => bank.key === value);
+      const payload: ICreateAccountDto = {
+        accountNumber,
+        bankCode: bank?.key as string,
+        bankName: bank?.label as string,
+        accountType: WALLET_TYPE.NGN,
+        accountName: validatedAccount as string
+      };
+      setIsLoading(true);
+      const response = await createAccount(payload);
+      console.log(response);
+      // await getUserBanks();
+      query.invalidateQueries({ queryKey: ["/wallet/banks/accounts"] })
+      setIsLoading(false);
+      addToast({
+        title: "Account created",
+        severity: "success",
+        color: "success",
+      });
+      onClose();
+    } catch (error) {
+      console.log(error);
+      addToast({
+        title: "An Error occured while creating account",
+        severity: "danger",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChange = (e: string) => {
+    console.log(e);
+    setValue(e);
+  };
+
+  useEffect(() => {
+    if (value && accountNumber?.length >= 10) {
+      checkAccount.mutate({
+        accountNumber: accountNumber,
+        bankCode: value
+      })
+    }
+  }, [value])
+
+  return (
+    <Modal isOpen={isOpen} size="sm" backdrop="blur" onClose={onClose}>
+      <ModalContent>
+        {(onClose) => (
+          <ModalBody className="px-5 pt-6">
+            <p className="text-lg text-[#404040] text-center font-bold">
+              Add Bank account
+            </p>
+            <p className="text-sm text-[#777777] text-center">
+              You can select bank accounts you add for funds deposits
+            </p>
+            <p className="text-gray-400 text-sm mt-2">Account Number</p>
+            <Input
+              type="text"
+              value={accountNumber}
+              onChange={(e) => setAccountNumber(e.target.value)}
+            />
+            <p className="text-gray-400 text-sm mt-2">Bank</p>
+            <Select
+              selectedKeys={[value]}
+              disabled={accountNumber === "" || accountNumber.length < 10}
+              onChange={(val) => handleChange(val.target.value)}
+            >
+              {banks.map((bank) => (
+                <SelectItem key={bank.key}>{bank.label}</SelectItem>
+              ))}
+            </Select>
+
+            {validatedAccount && (
+              <p className="text-gray-400 text-sm mt-2">
+                {validatedAccount?.toUpperCase()}
+              </p>
+            )}
+
+            <div className="w-full flex justify-center">
+              <Button
+                className="mt-2 rounded-full text-xs w-full"
+                onPress={() => handleClick()}
+                variant="solid"
+                color="primary"
+                isLoading={isLoading}
+              >
+                Add account
+              </Button>
+            </div>
+          </ModalBody>
+        )}
+      </ModalContent>
+    </Modal>
+  );
+}
+
+export default AddBankModal;

@@ -68,7 +68,7 @@ export const adminLinks = [
         link: "/admin/users",
         icon: PiUsersFill,
     },
-     {
+    {
         label: "Waitlist",
         link: "/admin/waitlist",
         icon: FiUsers,
@@ -96,6 +96,11 @@ export const adminLinks = [
     {
         label: "Rewards",
         link: "/admin/rewards",
+        icon: FaAward,
+    },
+    {
+        label: "Work Experience",
+        link: "/admin/work-experience",
         icon: FaAward,
     },
     {
