@@ -5,8 +5,9 @@ import { useFetchData } from "@/hook/useFetchData";
 import { dateFormat } from "@/helper/utils/dateFormat";
 import { LoadingLayout } from "@/components/shared";
 import useApproval from "@/hook/useApproval";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { IApplicationDetail } from "@/helper/model/application";
+import ApprovalsTableHeader from "./ApprovalsTableHeader";
 
 interface ApprovalRequest {
     id: string;
@@ -19,7 +20,7 @@ interface ApprovalRequest {
 }
 
 interface CoachApplicationTableProps {
-    requests: ApprovalRequest[];
+    requests?: ApprovalRequest[];
 }
 
 export default function CoachApplicationTable({
@@ -28,6 +29,7 @@ export default function CoachApplicationTable({
 
     const [id, setId] = useState("")
     const [status, setStatus] = useState("")
+    const [searchTerm, setSearchTerm] = useState("")
 
     const { data = [], isLoading } = useFetchData<IApplicationDetail[]>({ name: "application", endpoint: "/application/admin" });
 
@@ -46,37 +48,72 @@ export default function CoachApplicationTable({
         })
     }
 
+    const rawData = Array.isArray(data) ? data : [];
+
+    const filteredData = useMemo(() => {
+        if (!searchTerm.trim()) return rawData;
+        const term = searchTerm.toLowerCase().trim();
+        return rawData.filter((request) => {
+            const firstName = (request?.user?.firstName || "").toLowerCase();
+            const lastName = (request?.user?.lastName || "").toLowerCase();
+            const fullName = `${firstName} ${lastName}`.trim();
+            const email = (request?.user?.email || "").toLowerCase();
+            const expertise = (request?.expertise || "").toLowerCase();
+            const focusArea = (request?.focusArea || "").toLowerCase();
+            const experience = String(request?.yearsOfExperience || "").toLowerCase();
+            const statusStr = (request?.status || "").toLowerCase();
+
+            return (
+                firstName.includes(term) ||
+                lastName.includes(term) ||
+                fullName.includes(term) ||
+                email.includes(term) ||
+                expertise.includes(term) ||
+                focusArea.includes(term) ||
+                experience.includes(term) ||
+                statusStr.includes(term)
+            );
+        });
+    }, [rawData, searchTerm]);
+
     return (
-        <LoadingLayout loading={isLoading} >
-            <div className="overflow-x-auto">
-                <table className="w-full">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
-                                Name
-                            </th>
-                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-600" >
-                                Years Of Experience
-                            </th>
-                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
-                                Expertise
-                            </th>
-                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
-                                FocusArea
-                            </th>
-                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
-                                Date
-                            </th>
-                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
-                                Status
-                            </th>
-                            <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
-                                Action
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data?.map((request) => (
+        <div className="w-full">
+            <ApprovalsTableHeader
+                title="Coach Applications"
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                placeholder="Search by name, expertise, or status..."
+            />
+            <LoadingLayout loading={isLoading} lenght={filteredData.length}>
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                                    Name
+                                </th>
+                                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600" >
+                                    Years Of Experience
+                                </th>
+                                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                                    Expertise
+                                </th>
+                                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                                    FocusArea
+                                </th>
+                                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                                    Date
+                                </th>
+                                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                                    Status
+                                </th>
+                                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredData?.map((request) => (
                             <tr
                                 key={request._id}
                                 className="border-b border-gray-100 hover:bg-gray-50"
@@ -161,5 +198,6 @@ export default function CoachApplicationTable({
                 </table>
             </div>
         </LoadingLayout>
+        </div>
     );
 }

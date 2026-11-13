@@ -4,17 +4,19 @@ import { InputOtp, Pagination, Table, TableBody, TableCell, TableColumn, TableHe
 import { LoadingLayout, ModalLayout } from "../shared";
 import { IPagination } from "@/helper/model/pagination";
 import { IPayout } from "@/helper/model/payout";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { formatNumber } from "@/helper/utils/numberFormat";
 import { dateFormat } from "@/helper/utils/dateFormat";
 import { CustomButton } from "../custom";
 import useApproval from "@/hook/useApproval";
 import { IUser } from "@/helper/model/user";
+import ApprovalsTableHeader from "../admin/approvals/ApprovalsTableHeader";
 
 export default function PayoutTable() {
 
     const [id, setId] = useState("")
     const [status, setStatus] = useState("")
+    const [searchTerm, setSearchTerm] = useState("")
     const [payoutData, setPayoutData] = useState<IPayout[]>([])
     const [page, setPage] = useState(1)
 
@@ -59,9 +61,36 @@ export default function PayoutTable() {
         return user?.fullName;
     }
 
+    const filteredPayoutData = useMemo(() => {
+        if (!searchTerm.trim()) return payoutData;
+        const term = searchTerm.toLowerCase().trim();
+        return payoutData.filter((item) => {
+            const name = (getName(item?.user) || "").toLowerCase();
+            const amount = formatNumber(item?.amount).toLowerCase();
+            const rawAmount = String(item?.amount || "").toLowerCase();
+            const date = dateFormat(item?.createdAt).toLowerCase();
+            const itemStatus = (item?.status || "").toLowerCase();
+
+            return (
+                name.includes(term) ||
+                amount.includes(term) ||
+                rawAmount.includes(term) ||
+                date.includes(term) ||
+                itemStatus.includes(term)
+            );
+        });
+    }, [payoutData, searchTerm]);
+
     return (
-        <LoadingLayout loading={isLoading} lenght={data?.items?.length} >
+        <LoadingLayout loading={isLoading} lenght={filteredPayoutData.length} >
             <div className="w-full flex flex-col gap-6 items-center">
+                <ApprovalsTableHeader
+                    title="Payout Requests"
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    placeholder="Search by name, amount, or status..."
+                    count={filteredPayoutData.length}
+                />
                 <Table aria-label="Example static collection table">
                     <TableHeader>
                         <TableColumn>NAME</TableColumn>
@@ -71,7 +100,7 @@ export default function PayoutTable() {
                         <TableColumn>Action</TableColumn>
                     </TableHeader>
                     <TableBody>
-                        {payoutData?.map((item, index) => {
+                        {filteredPayoutData?.map((item, index) => {
                             return (
                                 <TableRow key={index}>
                                     <TableCell>{getName(item?.user)}</TableCell>

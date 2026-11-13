@@ -1,5 +1,12 @@
 "use client";
-import { useState } from "react";
+import React from "react";
+import {
+  Avatar,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/react";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
 export interface AdminRow {
@@ -7,8 +14,8 @@ export interface AdminRow {
   name: string;
   role: string;
   email: string;
-  access: string;
-  avatarUrl: string;
+  access: string[] | string;
+  avatarUrl?: string;
 }
 
 interface AdminRolesTableProps {
@@ -22,7 +29,18 @@ export default function AdminRolesTable({
   onEditAccess,
   onRemove,
 }: AdminRolesTableProps) {
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const formatRole = (role: string) => {
+    if (!role) return "Admin";
+    return role.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  };
+
+  const parseAccessList = (access: string[] | string): string[] => {
+    if (Array.isArray(access)) return access;
+    if (typeof access === "string" && access.trim()) {
+      return access.split(",").map((s) => s.trim()).filter(Boolean);
+    }
+    return [];
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -41,60 +59,99 @@ export default function AdminRolesTable({
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Access
             </th>
-            <th className="px-6 py-3" />
+            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Action
+            </th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {admins.map((row) => (
-            <tr key={row.id} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center gap-3">
-                  {/* <img
-                    src={row.avatarUrl}
-                    alt={row.name}
-                    className="h-8 w-8 rounded-full object-cover"
-                  /> */}
-                  <span className="text-sm text-gray-900">{row.name}</span>
+          {admins.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="py-12 text-center text-sm text-gray-500">
+                <div className="flex flex-col items-center justify-center gap-1.5">
+                  <p className="font-semibold text-gray-700">No administrators found</p>
+                  <p className="text-xs text-gray-400">Click &quot;Add Administrator&quot; to invite a new admin</p>
                 </div>
               </td>
-              <td className="px-6 py-4 text-sm text-gray-700">{row.role}</td>
-              <td className="px-6 py-4 text-sm text-gray-700">{row.email}</td>
-              <td className="px-6 py-4 text-sm text-gray-700">{row.access}</td>
-              <td className="px-6 py-4 text-right relative">
-                <button
-                  className="p-2 rounded-md hover:bg-gray-100"
-                  onClick={() =>
-                    setOpenMenu(openMenu === row.id ? null : row.id)
-                  }
-                  aria-label="Actions"
-                >
-                  <HiOutlineDotsHorizontal />
-                </button>
-                {openMenu === row.id && (
-                  <div className="absolute right-4 mt-2 w-40 bg-white rounded-md border shadow-md z-10">
-                    <button
-                      className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
-                      onClick={() => {
-                        setOpenMenu(null);
-                        onEditAccess(row);
-                      }}
-                    >
-                      Edit access
-                    </button>
-                    <button
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                      onClick={() => {
-                        setOpenMenu(null);
-                        onRemove(row);
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                )}
-              </td>
             </tr>
-          ))}
+          ) : (
+            admins.map((row) => {
+              const accessList = parseAccessList(row.access);
+              return (
+                <tr key={row.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <Avatar
+                        className="w-8 h-8 text-xs shrink-0"
+                        name={row.name}
+                        color="primary"
+                        src={row.avatarUrl && row.avatarUrl !== "/work.jpg" ? row.avatarUrl : undefined}
+                      />
+                      <span className="text-sm font-medium text-gray-900">{row.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        row.role === "SUPER_ADMIN"
+                          ? "bg-purple-100 text-purple-800"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {formatRole(row.role)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{row.email}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {accessList.length === 0 ? (
+                      <span className="text-xs text-gray-400">No access assigned</span>
+                    ) : (
+                      <div className="flex flex-wrap items-center gap-1.5 max-w-md">
+                        {accessList.slice(0, 3).map((item, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700"
+                          >
+                            {item.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase())}
+                          </span>
+                        ))}
+                        {accessList.length > 3 && (
+                          <span className="text-xs font-medium text-gray-500">
+                            +{accessList.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                    <Dropdown placement="bottom-end">
+                      <DropdownTrigger>
+                        <button
+                          className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none"
+                          aria-label="Actions"
+                        >
+                          <HiOutlineDotsHorizontal size={18} />
+                        </button>
+                      </DropdownTrigger>
+                      <DropdownMenu aria-label="Admin Actions">
+                        <DropdownItem key="edit" onPress={() => onEditAccess(row)}>
+                          Edit access
+                        </DropdownItem>
+                        <DropdownItem
+                          key="remove"
+                          className="text-danger"
+                          color="danger"
+                          onPress={() => onRemove(row)}
+                        >
+                          Remove
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              );
+            })
+          )}
         </tbody>
       </table>
     </div>

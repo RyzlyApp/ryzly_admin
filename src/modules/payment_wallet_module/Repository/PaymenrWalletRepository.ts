@@ -1,0 +1,202 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { BaseRepository } from "@/dal";
+
+import { ICreateOrderDto, PAYMENT_STATUS } from "../dto/create-payment-dto";
+import { IVerifyPaymentDto } from "../dto/verify-payment-dto";
+import { ICreateAccountDto } from "../dto/create-account-dto";
+import { WalletModel } from "../models/Wallet-model";
+import { PaymentModel } from "../models/PaymentModel";
+import { PaystackBankModel } from "../models/PaystackBankModel";
+import { AccountModel } from "../models/Account-model";
+import { IPayout } from "../models/Payout-Model";
+import { GeneralResponse } from "@/modules/general/General-response";
+import { RepositoryPayload } from "@/modules/general/Repository-payload";
+import { ENDPOINTS } from "@/modules/general/endpoints";
+export class PaymentWalletRepository extends BaseRepository {
+    private paymentEndpoints = ENDPOINTS.payment;
+    private walletEndpoints = ENDPOINTS.wallet;
+    private payoutEndpoints = ENDPOINTS.payout;
+
+    public async createPayment(
+        payload: RepositoryPayload<ICreateOrderDto, null>,
+        token?: string,
+    ): Promise<GeneralResponse<PaymentModel>> {
+        const response = await this.httpClient.post(
+            this.paymentEndpoints.create_order,
+            payload.body,
+            {
+                headers: token
+                    ? { Authorization: `Bearer ${token}` }
+                    : undefined,
+            },
+        );
+
+        return response.data;
+    }
+
+    public async verifyPayment(
+        payload: RepositoryPayload<IVerifyPaymentDto, null>,
+        token?: string,
+    ): Promise<GeneralResponse<any>> {
+        return this.httpClient.post(
+            this.paymentEndpoints.verify_payment,
+            payload.body,
+            {
+                headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            },
+        );
+    }
+
+    public async getUserPayments(
+        payload: RepositoryPayload<null, { status: PAYMENT_STATUS }>,
+    ): Promise<GeneralResponse<any>> {
+        return this.httpClient.get(this.paymentEndpoints.payment_list, {
+            params: {
+                status: payload.params?.status,
+            },
+        });
+    }
+
+    public async getPaymentByTypeId(
+        payload: RepositoryPayload<null, { typeId: string }>,
+    ): Promise<GeneralResponse<any>> {
+        return this.httpClient.get(
+            this.paymentEndpoints.get_payment_by_typeid(
+                payload.params?.typeId as string,
+            ),
+            {},
+        );
+    }
+
+    public async getWallet(
+        organisationId?: string,
+        token?: string,
+    ): Promise<GeneralResponse<WalletModel>> {
+        const endpoint = organisationId
+            ? this.walletEndpoints.get_account_by_organisation_id(
+                  organisationId,
+              )
+            : this.walletEndpoints.get_wallet;
+
+        const response = await this.httpClient.get(endpoint, {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+
+        return response.data;
+    }
+
+
+    public async getEscrow( 
+        token?: string,
+    ): Promise<GeneralResponse<WalletModel>> {
+        const endpoint = this.walletEndpoints.get_escrow;
+
+        const response = await this.httpClient.get(endpoint, {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+
+        return response.data;
+    }
+
+    public async getBanks(
+        payload: RepositoryPayload<null, { cursor?: string }>,
+    ): Promise<
+        GeneralResponse<{
+            data: PaystackBankModel[];
+            message: string;
+            status: boolean;
+        }>
+    > {
+        const response = await this.httpClient.get(
+            this.walletEndpoints.get_paystack_bank_list,
+            {
+                params: {
+                    cursor: payload.params?.cursor,
+                },
+            },
+        );
+        return response.data;
+    }
+
+    public async createAccount(
+        payload: RepositoryPayload<ICreateAccountDto, null>,
+        organisationId?: string,
+    ): Promise<GeneralResponse<AccountModel>> {
+        const endpoint = organisationId
+            ? this.walletEndpoints.create_organisation_bank(organisationId)
+            : this.walletEndpoints.create_bank;
+
+        return this.httpClient.post(endpoint, payload.body);
+    }
+
+    public async getAccounts(
+        payload: RepositoryPayload<null, null>,
+        organisationId?: string,
+    ): Promise<GeneralResponse<AccountModel[]>> {
+        const endpoint = organisationId
+            ? this.walletEndpoints.get_account_by_organisation_bank(
+                  organisationId,
+              )
+            : this.walletEndpoints.get_user_accounts;
+
+        const response = await this.httpClient.get(endpoint);
+        return response.data;
+    }
+
+    public async deleteAccount(
+        payload: RepositoryPayload<null, { id: string }>,
+    ): Promise<GeneralResponse<any>> {
+        const response = await this.httpClient.delete(
+            this.walletEndpoints.delete_account(payload.params?.id as string),
+        );
+        return response.data;
+    }
+
+    public async createPayout(
+        payload: RepositoryPayload<{ amount: number }, null>,
+        organisationId?: string,
+    ): Promise<GeneralResponse<any>> {
+        const endpoint = organisationId
+            ? this.payoutEndpoints.create_organisation_payout(organisationId)
+            : this.payoutEndpoints.create_payout;
+        const response = await this.httpClient.post(endpoint, payload.body);
+
+        return response.data;
+    }
+
+    public async getPayouts(
+        payload: RepositoryPayload<
+            null,
+            {
+                page: number;
+                limit: number;
+                userId: string;
+                status?: "PENDING" | "SUCCESS" | "FAILED";
+            }
+        >,
+        organisationId?: string,
+    ): Promise<
+        GeneralResponse<{
+            items: IPayout[];
+            page: number;
+            limit: number;
+            total: number;
+        }>
+    > {
+        const endpoint = organisationId
+            ? `${this.payoutEndpoints.create_payout}/organization/${payload.params?.userId}`
+            : `${this.payoutEndpoints.create_payout}/user/${payload.params?.userId}`;
+
+        const response = await this.httpClient.get(endpoint, {
+            params: {
+                page: payload.params?.page,
+                limit: payload.params?.limit,
+                status: payload.params?.status,
+            },
+        });
+        return response.data;
+    }
+}
+
+const paymentWalletRepository = new PaymentWalletRepository();
+export default paymentWalletRepository;

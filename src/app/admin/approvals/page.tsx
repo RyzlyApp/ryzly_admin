@@ -13,6 +13,7 @@ export default function AdminApprovals() {
 
   const query = useSearchParams();
   const tab = query?.get('tab') as string;
+  const activeTab = tab || "payout";
 
   const tabs = [
     { id: "payout", label: "Payout Request", index: 0 },
@@ -24,20 +25,20 @@ export default function AdminApprovals() {
     <div className="bg-white rounded-lg shadow-sm">
       <ApprovalsTabs
         tabs={tabs}
-        activeTab={tab}
+        activeTab={activeTab}
       />
 
       <div className="p-6">
         <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
-          {tab === "payout" && (
+          {activeTab === "payout" && (
             <PayoutTable />
           )}
 
-          {tab === "coach" && (
+          {activeTab === "coach" && (
             <CoachApproval />
           )}
 
-          {tab === "challenge" && (
+          {activeTab === "challenge" && (
             <ChallengeApproval />
           )}
         </Suspense>
