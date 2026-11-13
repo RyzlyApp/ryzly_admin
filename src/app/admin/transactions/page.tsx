@@ -57,7 +57,7 @@ export default function TransactionsPage() {
         startDate: "",
         endDate: "",
       }}
-      onSubmit={() => {}}
+      onSubmit={() => { }}
     >
       {({ values, resetForm }) => {
         // Filter transactions based on Formik values

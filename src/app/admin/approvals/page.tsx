@@ -1,6 +1,6 @@
 "use client";
 import { lazy, Suspense } from "react";
-import ApprovalsTabs from "@/components/admin/approvals/ApprovalsTabs"; 
+import ApprovalsTabs from "@/components/admin/approvals/ApprovalsTabs";
 import { useSearchParams } from "next/navigation";
 
 
