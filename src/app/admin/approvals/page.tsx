@@ -13,7 +13,6 @@ export default function AdminApprovals() {
 
   const query = useSearchParams();
   const tab = query?.get('tab') as string;
-  const activeTab = tab || "payout";
 
   const tabs = [
     { id: "payout", label: "Payout Request", index: 0 },
@@ -25,7 +24,7 @@ export default function AdminApprovals() {
     <div className="bg-white rounded-lg shadow-sm">
       <ApprovalsTabs
         tabs={tabs}
-        activeTab={activeTab}
+        activeTab={tab}
       />
 
       <div className="p-6">
