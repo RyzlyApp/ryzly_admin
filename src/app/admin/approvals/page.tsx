@@ -29,15 +29,15 @@ export default function AdminApprovals() {
 
       <div className="p-6">
         <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
-          {tab === "payout" && (
+          {activeTab === "payout" && (
             <PayoutTable />
           )}
 
-          {tab === "coach" && (
+          {activeTab === "coach" && (
             <CoachApproval />
           )}
 
-          {tab === "challenge" && (
+          {activeTab === "challenge" && (
             <ChallengeApproval />
           )}
         </Suspense>
