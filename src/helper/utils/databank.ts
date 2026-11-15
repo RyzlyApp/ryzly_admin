@@ -13,7 +13,7 @@ import {
     PiSquaresFourThin,
     PiUsersFill,
 } from "react-icons/pi";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaBriefcase, FaCheckCircle } from "react-icons/fa";
 import { FaAward } from "react-icons/fa6";
 import { IoPeopleCircleOutline } from "react-icons/io5";
 import { FiUser, FiUsers } from "react-icons/fi";
@@ -101,7 +101,7 @@ export const adminLinks = [
     {
         label: "Work Experience",
         link: "/admin/work-experience",
-        icon: FaAward,
+        icon: FaBriefcase,
     },
     {
         label: "Reports",

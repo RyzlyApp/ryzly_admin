@@ -29,7 +29,7 @@ export default function AdminApprovals() {
 
       <div className="p-6">
         <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
-          {tab === "payout" && (
+          {(tab === "payout" || !tab) && (
             <PayoutTable />
           )}
 
