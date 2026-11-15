@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import CustomButton from "@/components/custom/customButton";
 import {
   Modal,
