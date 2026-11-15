@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import CustomButton from "@/components/custom/customButton";
 import {
   Modal,
@@ -6,6 +7,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Avatar,
 } from "@heroui/react";
 
 interface RemoveAdminModalProps {
@@ -14,14 +16,16 @@ interface RemoveAdminModalProps {
   adminName: string;
   avatarUrl?: string;
   onConfirm: () => void;
+  isLoading?: boolean;
 }
 
 export default function RemoveAdminModal({
   open,
   onClose,
   adminName,
-  avatarUrl = "/work.jpg",
+  avatarUrl,
   onConfirm,
+  isLoading = false,
 }: RemoveAdminModalProps) {
   return (
     <Modal
@@ -32,38 +36,42 @@ export default function RemoveAdminModal({
       size="md"
     >
       <ModalContent>
-        <ModalHeader className="justify-center">Remove</ModalHeader>
-        <ModalBody>
-          <div className="text-center space-y-3">
+        <ModalHeader className="justify-center border-b border-gray-100 pb-3">
+          <h3 className="text-lg font-semibold text-gray-900">Remove Administrator</h3>
+        </ModalHeader>
+        <ModalBody className="py-5">
+          <div className="text-center space-y-4">
             <div className="flex items-center justify-center gap-3">
-              <img
-                src={avatarUrl}
-                alt={adminName}
-                className="h-8 w-8 rounded-full object-cover"
+              <Avatar
+                className="w-10 h-10 text-sm"
+                name={adminName}
+                color="danger"
+                src={avatarUrl && avatarUrl !== "/work.jpg" ? avatarUrl : undefined}
               />
-              <span className="text-sm text-gray-900">{adminName}</span>
+              <span className="text-base font-semibold text-gray-900">{adminName}</span>
             </div>
-            <p className="text-xs text-gray-600">
+            <p className="text-sm text-gray-600 leading-relaxed max-w-sm mx-auto">
               Are you sure you want to remove this admin? Once removed, they
-              will lose all administrative privileges and access to the
-              dashboard.
+              will lose all administrative privileges and access to the dashboard.
             </p>
           </div>
         </ModalBody>
-        <ModalFooter>
-          <div className="flex flex-col items-center justify-center gap-3 w-full">
+        <ModalFooter className="border-t border-gray-100 pt-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
+            <CustomButton
+              variant="outline"
+              onClick={onClose}
+              fullWidth={true}
+            >
+              Cancel
+            </CustomButton>
             <CustomButton
               variant="customDanger"
-              onClick={() => {
-                onConfirm();
-                onClose();
-              }}
+              onClick={onConfirm}
+              isLoading={isLoading}
               fullWidth={true}
             >
               Remove
-            </CustomButton>
-            <CustomButton variant="outline" onClick={onClose} fullWidth={true}>
-              Cancel
             </CustomButton>
           </div>
         </ModalFooter>

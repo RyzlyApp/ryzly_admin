@@ -16,6 +16,22 @@ const useAuth = () => {
 
     const loginMutation = useMutation({
         mutationFn: (data: ILogin) => unsecureHttpService.post(`/admin-auth/login`, data),
+        onSuccess: (data) => {
+
+            console.log(data?.data?.data?.token);
+
+            router.push(`/admin/dashboard`)
+
+
+            Cookies.set("adminId", data?.data?.data?.adminId);
+            Cookies.set("accesstoken", data?.data?.data?.token);
+
+            addToast({
+                title: "Success",
+                description: data?.data?.message,
+                color: "success",
+            })
+        },
         onError: (error: AxiosError) => {
 
             const message =
@@ -29,22 +45,7 @@ const useAuth = () => {
                 timeout: 3000
             })
         },
-        onSuccess: (data) => {
 
-            console.log(data?.data?.data?.token);
-
-            router.push(`/admin/dashboard`)
-
-
-            Cookies.set("adminId", data?.data?.data?.adminId);
-            Cookies.set("accesstoken", data?.data?.data?.token); 
-            
-            addToast({
-                title: "Success",
-                description: data?.data?.message,
-                color: "success",
-            })
-        },
     });
 
     const signupMutation = useMutation({
@@ -105,7 +106,7 @@ const useAuth = () => {
             }
         },
     });
- 
+
 
     const formikSignup = useFormik({
         initialValues: {
@@ -128,13 +129,13 @@ const useAuth = () => {
 
     const formik = useFormik({
         initialValues: {
-            email: "", 
+            email: "",
             password: ""
         },
         validationSchema: Yup.object({
             email: Yup.string()
                 .email("Invalid email format")
-                .required("Required"), 
+                .required("Required"),
             password: Yup.string()
                 .required("password")
         }),
@@ -150,7 +151,7 @@ const useAuth = () => {
         formik,
         formikSignup,
         loginMutation,
-        signupMutation, 
+        signupMutation,
         userDetails,
         isLoading
     }

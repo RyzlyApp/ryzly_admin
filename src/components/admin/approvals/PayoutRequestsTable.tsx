@@ -2,6 +2,8 @@ import { Avatar } from "@heroui/react";
 import CustomButton from "@/components/custom/customButton";
 import { useFetchData } from "@/hook/useFetchData";
 import { LoadingLayout } from "@/components/shared";
+import { useState, useMemo } from "react";
+import ApprovalsTableHeader from "./ApprovalsTableHeader";
 
 interface ApprovalRequest {
   id: string;
@@ -14,103 +16,148 @@ interface ApprovalRequest {
 }
 
 interface PayoutRequestsTableProps {
-  requests: ApprovalRequest[];
+  requests?: ApprovalRequest[];
 }
 
 export default function PayoutRequestsTable({
   requests,
 }: PayoutRequestsTableProps) {
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { data, isLoading } = useFetchData<any>({ name: "application", endpoint: "/payout/admin" }); 
 
+  const rawItems: any[] = useMemo(() => {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.items)) return data.items;
+    if (Array.isArray(data?.data)) return data.data;
+    return [];
+  }, [data]);
+
+  const filteredItems = useMemo(() => {
+    if (!searchTerm.trim()) return rawItems;
+    const term = searchTerm.toLowerCase().trim();
+    return rawItems.filter((request: any) => {
+      const firstName = (request?.userId?.firstName || "").toLowerCase();
+      const lastName = (request?.userId?.lastName || "").toLowerCase();
+      const fullName = `${firstName} ${lastName}`.trim();
+      const email = (request?.userId?.email || "").toLowerCase();
+      const name = (request?.name || "").toLowerCase();
+      const availableBalance = String(request?.availableBalance || "").toLowerCase();
+      const amountRequested = String(request?.amountRequested || "").toLowerCase();
+      const status = String(request?.status || "").toLowerCase();
+      const date = String(request?.date || "").toLowerCase();
+
+      return (
+        firstName.includes(term) ||
+        lastName.includes(term) ||
+        fullName.includes(term) ||
+        email.includes(term) ||
+        name.includes(term) ||
+        availableBalance.includes(term) ||
+        amountRequested.includes(term) ||
+        status.includes(term) ||
+        date.includes(term)
+      );
+    });
+  }, [rawItems, searchTerm]);
+
   return (
-    <LoadingLayout loading={isLoading} lenght={data?.items?.length} > 
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
-                Name
-              </th>
-              <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
-                Available Balance
-              </th>
-              <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
-                Amount Requested
-              </th>
-              <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
-                Date
-              </th>
-              <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
-                Status
-              </th>
-              <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {data?.items?.map((request: any) => (
-              <tr
-                key={request.id}
-                className="border-b border-gray-100 hover:bg-gray-50"
-              >
-                <td className="py-4 px-6">
-                  <div className="flex items-center gap-3">
-                    <Avatar
-                      className="w-8 h-8 text-xs"
-                      name={request?.userId?.firstName}
-                      src={request?.userId?.profilePicture}
-                      color="primary"
-                    />
-                    <span className="text-sm font-medium text-gray-900">
-                      {request?.userId?.firstName} {request?.userId?.lastName}
-                    </span>
-                  </div>
-                </td>
-                <td className="py-4 px-6 text-sm text-gray-900">
-                  {request.availableBalance}
-                </td>
-                <td className="py-4 px-6 text-sm text-gray-900">
-                  {request.amountRequested}
-                </td>
-                <td className="py-4 px-6 text-sm text-gray-900">
-                  {request.date}
-                </td>
-                <td className="py-4 px-6">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`w-2 h-2 rounded-full ${request.status === "Pending"
-                          ? "bg-gray-400"
-                          : "bg-green-500"
-                        }`}
-                    ></div>
-                    <span className="text-sm text-gray-600">
-                      {request.status}
-                    </span>
-                  </div>
-                </td>
-                <td className="py-4 px-6">
-                  {request.status === "Pending" ? (
-                    <CustomButton
-                      variant="primary"
-                      size="sm"
-                      height="32px"
-                      fontSize="12px"
-                    >
-                      Approve
-                    </CustomButton>
-                  ) : (
-                    <span className="text-sm text-green-600 font-medium">
-                      Approved
-                    </span>
-                  )}
-                </td>
+    <div className="w-full">
+      <ApprovalsTableHeader
+        title="Payout Requests"
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        placeholder="Search by name, amount, or status..."
+        count={filteredItems.length}
+      />
+      <LoadingLayout loading={isLoading} lenght={filteredItems.length}> 
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                  Name
+                </th>
+                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                  Available Balance
+                </th>
+                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                  Amount Requested
+                </th>
+                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                  Date
+                </th>
+                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                  Status
+                </th>
+                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600">
+                  Action
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </LoadingLayout>
+            </thead>
+            <tbody>
+              {filteredItems.map((request: any, index: number) => (
+                <tr
+                  key={request._id || request.id || index}
+                  className="border-b border-gray-100 hover:bg-gray-50"
+                >
+                  <td className="py-4 px-6">
+                    <div className="flex items-center gap-3">
+                      <Avatar
+                        className="w-8 h-8 text-xs"
+                        name={request?.userId?.firstName}
+                        src={request?.userId?.profilePicture}
+                        color="primary"
+                      />
+                      <span className="text-sm font-medium text-gray-900">
+                        {request?.userId?.firstName} {request?.userId?.lastName}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-6 text-sm text-gray-900">
+                    {request.availableBalance}
+                  </td>
+                  <td className="py-4 px-6 text-sm text-gray-900">
+                    {request.amountRequested}
+                  </td>
+                  <td className="py-4 px-6 text-sm text-gray-900">
+                    {request.date}
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-2 h-2 rounded-full ${request.status === "Pending"
+                            ? "bg-gray-400"
+                            : "bg-green-500"
+                          }`}
+                      ></div>
+                      <span className="text-sm text-gray-600">
+                        {request.status}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-6">
+                    {request.status === "Pending" ? (
+                      <CustomButton
+                        variant="primary"
+                        size="sm"
+                        height="32px"
+                        fontSize="12px"
+                      >
+                        Approve
+                      </CustomButton>
+                    ) : (
+                      <span className="text-sm text-green-600 font-medium">
+                        Approved
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </LoadingLayout>
+    </div>
   );
 }

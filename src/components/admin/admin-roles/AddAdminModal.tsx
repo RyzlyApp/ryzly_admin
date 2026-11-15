@@ -60,7 +60,7 @@ interface AddAdminModalProps {
   }) => void;
 }
 
-const ACCESS_ITEMS = [
+export const ACCESS_ITEMS = [
   {
     id: "dashboard",
     label: "Dashboard",

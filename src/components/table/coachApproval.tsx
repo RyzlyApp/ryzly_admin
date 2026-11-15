@@ -18,17 +18,19 @@ import {
   ModalBody,
   ModalFooter,
 } from "@heroui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { CustomButton } from "../custom";
 import { IPagination } from "@/helper/model/pagination";
 import { LoadingLayout } from "../shared";
 import { textLimit } from "@/helper/utils/textlimit";
+import ApprovalsTableHeader from "../admin/approvals/ApprovalsTableHeader";
 
 
 export default function CoachApproval() {
 
     const [id, setId] = useState("")
     const [status, setStatus] = useState("")
+    const [searchTerm, setSearchTerm] = useState("")
     const [showModal, setShowModal] = useState(false);
     const [activeId, setActiveId] = useState('');
     const [declineMessage, setDeclineMessage] = useState("");
@@ -83,10 +85,41 @@ export default function CoachApproval() {
         }
     }, [data?.data, isLoading]); 
 
+    const filteredCoachData = useMemo(() => {
+        if (!searchTerm.trim()) return coachData;
+        const term = searchTerm.toLowerCase().trim();
+        return coachData.filter((request) => {
+            const firstName = (request?.user?.firstName || "").toLowerCase();
+            const lastName = (request?.user?.lastName || "").toLowerCase();
+            const fullName = (request?.user?.fullName || `${firstName} ${lastName}`).trim().toLowerCase();
+            const email = (request?.user?.email || "").toLowerCase();
+            const experience = String(request?.yearsOfExperience || "").toLowerCase();
+            const expertise = (request?.expertise || "").toLowerCase();
+            const statusStr = (request?.status || "").toLowerCase();
+
+            return (
+                fullName.includes(term) ||
+                firstName.includes(term) ||
+                lastName.includes(term) ||
+                email.includes(term) ||
+                experience.includes(term) ||
+                expertise.includes(term) ||
+                statusStr.includes(term)
+            );
+        });
+    }, [coachData, searchTerm]);
+
     return (
-        <LoadingLayout loading={isLoading} lenght={data?.data?.length} >
+        <LoadingLayout loading={isLoading} lenght={filteredCoachData.length} >
 
             <div className=" w-full flex flex-col gap-6 items-center " >
+                <ApprovalsTableHeader
+                    title="Coach Applications"
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    placeholder="Search by name, expertise, or status..."
+                    count={filteredCoachData.length}
+                />
                 <Table aria-label="Example static collection table">
                     <TableHeader>
                         <TableColumn>NAME</TableColumn>
@@ -100,7 +133,7 @@ export default function CoachApproval() {
                         <TableColumn>Action</TableColumn>
                     </TableHeader>
                     <TableBody>
-                        {coachData.length > 0 ? coachData.map((request) => (
+                        {filteredCoachData.length > 0 ? filteredCoachData.map((request) => (
                             <TableRow
                                 key={request?._id}
                                 className="border-b border-gray-100 hover:bg-gray-50"

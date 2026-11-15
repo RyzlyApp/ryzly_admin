@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CustomButton from "@/components/custom/customButton";
 import {
   Modal,
@@ -7,7 +7,10 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Select,
+  SelectItem,
 } from "@heroui/react";
+import { ACCESS_ITEMS } from "./AddAdminModal";
 
 interface EditAccessModalProps {
   open: boolean;
@@ -15,20 +18,8 @@ interface EditAccessModalProps {
   adminName: string;
   currentAccess: string[];
   onSave: (updatedAccess: string[]) => void;
+  isLoading?: boolean;
 }
-
-const ACCESS = [
-  "dashboard",
-  "users",
-  "challenges",
-  "communities",
-  "approvals",
-  "transactions",
-  "rewards",
-  "reports",
-  "analytics",
-  "admin_roles",
-];
 
 export default function EditAccessModal({
   open,
@@ -36,17 +27,17 @@ export default function EditAccessModal({
   adminName,
   currentAccess,
   onSave,
+  isLoading = false,
 }: EditAccessModalProps) {
   const [access, setAccess] = useState<string[]>([]);
-  useEffect(() => {
-    if (open) setAccess(currentAccess);
-  }, [open, currentAccess]);
 
-  const toggle = (id: string) => {
-    setAccess((prev) =>
-      prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
-    );
-  };
+  useEffect(() => {
+    if (open) {
+      // Normalize incoming access strings to uppercase
+      const normalized = (currentAccess || []).map((a) => a.toUpperCase());
+      setAccess(normalized);
+    }
+  }, [open, currentAccess]);
 
   return (
     <Modal
@@ -54,40 +45,53 @@ export default function EditAccessModal({
       onOpenChange={(isOpen) => {
         if (!isOpen) onClose();
       }}
-      size="md"
+      size="lg"
       scrollBehavior="inside"
     >
       <ModalContent>
-        <ModalHeader>
-          <h3 className="text-lg font-semibold">Edit Access</h3>
+        <ModalHeader className="border-b border-gray-100 pb-3">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Edit Access Permissions</h3>
+            <p className="text-xs text-gray-500 font-normal">
+              Update module permissions for <span className="font-semibold text-gray-800">{adminName}</span>
+            </p>
+          </div>
         </ModalHeader>
-        <ModalBody className="space-y-4">
-          <p className="text-sm text-gray-600">
-            Update permissions for {adminName}.
-          </p>
-          <div className="space-y-3">
-            {ACCESS.map((key) => (
-              <label key={key} className="flex items-center justify-between">
-                <span className="text-sm capitalize text-gray-800">
-                  {key.replace("_", " ")}
-                </span>
-                <input
-                  type="checkbox"
-                  checked={access.includes(key)}
-                  onChange={() => toggle(key)}
-                  className="h-4 w-4"
-                />
-              </label>
-            ))}
+        <ModalBody className="space-y-4 py-4">
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">Manage Access</label>
+            <Select
+              aria-label="Manage Access"
+              placeholder="Select access permissions"
+              selectionMode="multiple"
+              selectedKeys={new Set(access)}
+              onSelectionChange={(keys) => {
+                const arr = Array.from(keys) as string[];
+                setAccess(arr);
+              }}
+              variant="bordered"
+              classNames={{
+                trigger: "bg-white border border-gray-300 rounded-lg min-h-11 shadow-none",
+                value: "text-sm text-gray-800",
+              }}
+            >
+              {ACCESS_ITEMS.map((item) => (
+                <SelectItem key={item.id} textValue={item.label}>
+                  {item.label} ({item.id})
+                </SelectItem>
+              ))}
+            </Select>
           </div>
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter className="border-t border-gray-100 pt-3">
           <div className="flex items-center justify-end gap-3 w-full">
-            <CustomButton variant="outline" onClick={onClose}>
+            <CustomButton variant="outline" type="button" onClick={onClose}>
               Cancel
             </CustomButton>
             <CustomButton
               variant="primary"
+              type="button"
+              isLoading={isLoading}
               onClick={() => {
                 onSave(access);
                 onClose();

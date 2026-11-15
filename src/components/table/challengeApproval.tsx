@@ -2,11 +2,12 @@ import { IChallenge } from "@/helper/model/challenge";
 import { dateFormatMonthDay } from "@/helper/utils/dateFormat"; 
 import { useFetchData } from "@/hook/useFetchData";
 import { Avatar, Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { CustomImage, CustomButton } from "../custom";
 import { IPagination } from "@/helper/model/pagination";
 import { LoadingLayout } from "../shared";
 import { useRouter } from "next/navigation";
+import ApprovalsTableHeader from "../admin/approvals/ApprovalsTableHeader";
 
 export default function ChallengesApproval() {
 
@@ -14,6 +15,7 @@ export default function ChallengesApproval() {
 
     const [challengeData, setChallengeData] = useState<IChallenge[]>([])
     const [page, setPage] = useState(1)
+    const [searchTerm, setSearchTerm] = useState("")
 
     const { data, isLoading } = useFetchData<IPagination<IChallenge[]>>({
         name: "challenge", endpoint: "/challenge/status", pagination: true,
@@ -32,9 +34,34 @@ export default function ChallengesApproval() {
         }
     }, [data?.data, isLoading]);
 
+    const filteredChallengeData = useMemo(() => {
+        if (!searchTerm.trim()) return challengeData;
+        const term = searchTerm.toLowerCase().trim();
+        return challengeData.filter((item) => {
+            const title = (item?.title || "").toLowerCase();
+            const fullName = (item?.creator?.fullName || `${item?.creator?.firstName || ""} ${item?.creator?.lastName || ""}`).trim().toLowerCase();
+            const statusStr = (
+                item?.isApproved === undefined ? "pending" : !item?.isApproved ? "reject" : "approved"
+            ).toLowerCase();
+
+            return (
+                title.includes(term) ||
+                fullName.includes(term) ||
+                statusStr.includes(term)
+            );
+        });
+    }, [challengeData, searchTerm]);
+
     return (
-        <LoadingLayout loading={isLoading} lenght={data?.data?.length} >
+        <LoadingLayout loading={isLoading} lenght={filteredChallengeData.length} >
             <div className=" w-full flex flex-col gap-6 items-center " >
+                <ApprovalsTableHeader
+                    title="Challenge Applications"
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    placeholder="Search by title, host, or status..."
+                    count={filteredChallengeData.length}
+                />
                 <Table aria-label="Example static collection table">
                     <TableHeader>
                         <TableColumn>Title</TableColumn>
@@ -44,7 +71,7 @@ export default function ChallengesApproval() {
                         <TableColumn>Action</TableColumn>
                     </TableHeader>
                     <TableBody>
-                        {challengeData?.map((item) => (
+                        {filteredChallengeData?.map((item) => (
                             <TableRow
                                 key={item._id}
                                 className="border-b border-gray-100 hover:bg-gray-50"
