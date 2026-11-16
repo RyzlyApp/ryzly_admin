@@ -45,7 +45,6 @@ const useAuth = () => {
                 timeout: 3000
             })
         },
-
     });
 
     const signupMutation = useMutation({
@@ -106,7 +105,6 @@ const useAuth = () => {
             }
         },
     });
-
 
     const formikSignup = useFormik({
         initialValues: {
