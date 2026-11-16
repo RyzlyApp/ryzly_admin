@@ -1,3 +1,4 @@
+"use client"
 import { useEffect, useState } from "react";
 import AdminRolesHeader from "@/components/admin/admin-roles/AdminRolesHeader";
 import AdminRolesTable, {
