@@ -1,18 +1,17 @@
 "use client";
 import React, { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import WorkExperienceProgramsHeader from "./WorkExperienceProgramsHeader";
 import WorkExperienceProgramsFilters from "./WorkExperienceProgramsFilters";
 import WorkExperienceProgramsTable from "./WorkExperienceProgramsTable";
-import {
-  INITIAL_WORK_EXPERIENCE_PROGRAMS,
-  IWorkExperienceProgram,
-} from "./types";
+import { IWorkExperienceProgram } from "./types";
 import { addToast } from "@heroui/toast";
+import useWorkExperiencePrograms from "@/hook/useWorkExperiencePrograms";
 
 export default function WorkExperienceProgramsView() {
-  const [programs, setPrograms] = useState<IWorkExperienceProgram[]>(
-    INITIAL_WORK_EXPERIENCE_PROGRAMS
-  );
+  const router = useRouter();
+  const { programs: fetchedPrograms, isLoading, publishProgram } =
+    useWorkExperiencePrograms();
 
   const [selectedProgram, setSelectedProgram] = useState("all");
   const [selectedIndustry, setSelectedIndustry] = useState("all");
@@ -20,7 +19,7 @@ export default function WorkExperienceProgramsView() {
   const [selectedStatus, setSelectedStatus] = useState("all");
 
   const filteredPrograms = useMemo(() => {
-    return programs.filter((p) => {
+    return fetchedPrograms.filter((p) => {
       // Program name filter
       if (
         selectedProgram !== "all" &&
@@ -55,76 +54,55 @@ export default function WorkExperienceProgramsView() {
       }
       return true;
     });
-  }, [programs, selectedProgram, selectedIndustry, selectedLevel, selectedStatus]);
+  }, [
+    fetchedPrograms,
+    selectedProgram,
+    selectedIndustry,
+    selectedLevel,
+    selectedStatus,
+  ]);
 
   const handleCreate = () => {
-    addToast({
-      title: "Create Work Experience",
-      description: "Opening work experience creator...",
-      color: "primary",
-    });
+    router.push("/admin/work-experience/create-workexp");
   };
 
   const handleView = (program: IWorkExperienceProgram) => {
-    addToast({
-      title: "View Work Experience",
-      description: `Opening ${program.title} ${program.subtitle || ""}`,
-      color: "primary",
-    });
+    router.push(`/admin/work-experience/create-workexp/${program.id}`);
+  };
+
+  const handleEdit = (program: IWorkExperienceProgram) => {
+    router.push(`/admin/work-experience/create-workexp/${program.id}`);
   };
 
   const handleAddIndustry = (program: IWorkExperienceProgram) => {
-    addToast({
-      title: "Add New Industry",
-      description: `Adding new industry to ${program.title}...`,
-      color: "primary",
-    });
+    router.push(`/admin/work-experience/create-workexp/${program.id}`);
   };
 
-  const handlePublish = (program: IWorkExperienceProgram) => {
-    setPrograms((prev) =>
-      prev.map((p) => (p.id === program.id ? { ...p, status: "Published" } : p))
-    );
-    addToast({
-      title: "Work Experience Published",
-      description: `${program.title} has been published successfully`,
-      color: "success",
-    });
+  const handlePublish = async (program: IWorkExperienceProgram) => {
+    try {
+      await publishProgram(program.id);
+    } catch {
+      // Handled in mutation onError
+    }
   };
 
   const handleUnpublish = (program: IWorkExperienceProgram) => {
-    setPrograms((prev) =>
-      prev.map((p) => (p.id === program.id ? { ...p, status: "Draft" } : p))
-    );
     addToast({
-      title: "Work Experience Unpublished",
-      description: `${program.title} moved to draft`,
+      title: "Work Experience Status",
+      description: `${program.title} status update request submitted`,
       color: "warning",
     });
   };
 
-  const handleEdit = (program: IWorkExperienceProgram) => {
-    addToast({
-      title: "Edit Program",
-      description: `Editing ${program.title}...`,
-      color: "primary",
-    });
-  };
-
-  const handleToggleStatus = (program: IWorkExperienceProgram) => {
-    const nextStatus = program.status === "Published" ? "Draft" : "Published";
-    setPrograms((prev) =>
-      prev.map((p) => (p.id === program.id ? { ...p, status: nextStatus } : p))
-    );
-    addToast({
-      title: "Status Updated",
-      description: `${program.title} is now ${nextStatus}`,
-      color: "success",
-    });
+  const handleToggleStatus = async (program: IWorkExperienceProgram) => {
+    if (program.status !== "Published") {
+      await handlePublish(program);
+    } else {
+      handleUnpublish(program);
+    }
   };
 
   const handleDelete = (program: IWorkExperienceProgram) => {
-    setPrograms((prev) => prev.filter((p) => p.id !== program.id));
     addToast({
       title: "Program Removed",
       description: `${program.title} has been deleted`,
@@ -149,6 +127,7 @@ export default function WorkExperienceProgramsView() {
 
       <WorkExperienceProgramsTable
         programs={filteredPrograms}
+        isLoading={isLoading}
         onView={handleView}
         onEdit={handleEdit}
         onAddIndustry={handleAddIndustry}

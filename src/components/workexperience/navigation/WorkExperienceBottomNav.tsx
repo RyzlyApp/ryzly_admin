@@ -37,6 +37,10 @@ export default function WorkExperienceBottomNav({
   const router = useRouter();
   const pathname = usePathname();
 
+  if (pathname?.includes("/create-workexp")) {
+    return null;
+  }
+
   const getActiveTab = (): string => {
     if (pathname?.startsWith("/admin/work-experience/programs")) return "programs";
     if (pathname?.startsWith("/admin/work-experience/participants")) return "participants";
