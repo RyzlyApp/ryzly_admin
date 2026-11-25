@@ -12,6 +12,7 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Spinner,
 } from "@heroui/react";
 import {
   RiComputerLine,
@@ -28,6 +29,7 @@ import {
 
 interface WorkExperienceProgramsTableProps {
   programs: IWorkExperienceProgram[];
+  isLoading?: boolean;
   onView?: (program: IWorkExperienceProgram) => void;
   onEdit?: (program: IWorkExperienceProgram) => void;
   onAddIndustry?: (program: IWorkExperienceProgram) => void;
@@ -39,6 +41,7 @@ interface WorkExperienceProgramsTableProps {
 
 export default function WorkExperienceProgramsTable({
   programs,
+  isLoading = false,
   onView,
   onEdit,
   onAddIndustry,
@@ -107,6 +110,8 @@ export default function WorkExperienceProgramsTable({
 
         <TableBody
           items={programs}
+          isLoading={isLoading}
+          loadingContent={<Spinner label="Loading programs..." color="primary" />}
           emptyContent="No work experience programs found matching your filters."
         >
           {(program) => (
@@ -210,6 +215,9 @@ export default function WorkExperienceProgramsTable({
                   <DropdownMenu aria-label="Program Actions">
                     <DropdownItem key="view" onPress={() => onView?.(program)}>
                       View Work Experience
+                    </DropdownItem>
+                    <DropdownItem key="edit" onPress={() => onEdit?.(program)}>
+                      Edit Work Experience
                     </DropdownItem>
                     <DropdownItem
                       key="add-industry"

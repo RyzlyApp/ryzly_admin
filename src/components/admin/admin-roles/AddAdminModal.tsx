@@ -46,7 +46,7 @@ const addAdminSchema = yup.object({
     .mixed<ADMIN_ROLE>()
     .oneOf(Object.values(ADMIN_ROLE) as ADMIN_ROLE[], "Select admin role")
     .required("Role is required"),
-    password: yup.string().trim().required("Password is required"),
+  password: yup.string().trim().required("Password is required"),
 });
 
 interface AddAdminModalProps {
@@ -188,7 +188,7 @@ export default function AddAdminModal({
                 </p>
               )}
             </div>
-             <div className="space-y-1">
+            <div className="space-y-1">
               <label className="text-sm text-gray-700">Password</label>
               <input
                 {...register("password")}
@@ -232,7 +232,7 @@ export default function AddAdminModal({
               )}
             </div>
 
-          {/* <div className="space-y-3">
+            {/* <div className="space-y-3">
             <p className="text-sm text-gray-600">Manage Access</p>
             <div className="space-y-3">
               {ACCESS_ITEMS.map((item) => (

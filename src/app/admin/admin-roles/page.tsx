@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import { useEffect, useState } from "react";
 import AdminRolesHeader from "@/components/admin/admin-roles/AdminRolesHeader";
 import AdminRolesTable, {
@@ -96,21 +96,21 @@ export default function AdminRolesPage() {
       <AddAdminModal
         open={isAddOpen}
         onClose={() => setIsAddOpen(false)}
-        onSubmit={() => {}}
+        onSubmit={() => { }}
       />
       <EditAccessModal
         open={!!editRow}
         onClose={() => setEditRow(null)}
         adminName={editRow?.name || ""}
         currentAccess={["dashboard", "users", "challenges"]}
-        onSave={() => {}}
+        onSave={() => { }}
       />
       <RemoveAdminModal
         open={!!removeRow}
         onClose={() => setRemoveRow(null)}
         adminName={removeRow?.name || ""}
         avatarUrl={removeRow?.avatarUrl}
-        onConfirm={() => {}}
+        onConfirm={() => { }}
       />
     </div>
   );

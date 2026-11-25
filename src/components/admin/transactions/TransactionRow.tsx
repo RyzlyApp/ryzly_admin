@@ -73,12 +73,12 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({ transaction, onC
     }
   };
 
-  const formattedAmount = transaction.currencyType === "NGN" 
-    ? `₦${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
+  const formattedAmount = transaction.currencyType === "NGN"
+    ? `₦${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     : `$${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
-    <tr 
+    <tr
       className="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
       onClick={onClick}
     >
