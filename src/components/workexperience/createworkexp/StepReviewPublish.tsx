@@ -26,6 +26,7 @@ interface StepReviewPublishProps {
   isSubmitting?: boolean;
   tracks?: Array<{ _id: string; name: string }>;
   industries?: Array<{ _id: string; name: string }>;
+  errorSteps?: number[];
 }
 
 export default function StepReviewPublish({
@@ -37,6 +38,7 @@ export default function StepReviewPublish({
   isSubmitting = false,
   tracks = [],
   industries = [],
+  errorSteps = [],
 }: StepReviewPublishProps) {
   // Confirmation modal disclosure
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -83,7 +85,6 @@ export default function StepReviewPublish({
   const handleConfirmPublish = (onClose: () => void) => {
     onClose();
     onFinalPublish();
-    onSuccessOpen();
   };
 
   return (
@@ -101,15 +102,32 @@ export default function StepReviewPublish({
         {/* Left Column: 4 Cards */}
         <div className="lg:col-span-8 flex flex-col gap-5">
           {/* 1. Basic Information Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-3">
+          <div
+            className={`bg-white rounded-2xl border shadow-sm p-6 flex flex-col gap-3 transition-all ${
+              errorSteps.includes(1)
+                ? "border-red-400 ring-2 ring-red-500/10 bg-red-50/10"
+                : "border-gray-100"
+            }`}
+          >
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-[#101828]">
-                Basic Information
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-[#101828]">
+                  Basic Information
+                </h3>
+                {errorSteps.includes(1) && (
+                  <span className="text-[11px] font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
+                    Required fields missing
+                  </span>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => onNavigateStep(1)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-[#5160E7] transition-colors cursor-pointer"
+                className={`flex items-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                  errorSteps.includes(1)
+                    ? "text-red-600 hover:text-red-700"
+                    : "text-gray-600 hover:text-[#5160E7]"
+                }`}
               >
                 <RiPencilLine size={14} />
                 <span>Edit</span>
@@ -127,15 +145,32 @@ export default function StepReviewPublish({
           </div>
 
           {/* 2. Industries & Companies Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-3">
+          <div
+            className={`bg-white rounded-2xl border shadow-sm p-6 flex flex-col gap-3 transition-all ${
+              errorSteps.includes(2)
+                ? "border-red-400 ring-2 ring-red-500/10 bg-red-50/10"
+                : "border-gray-100"
+            }`}
+          >
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-[#101828]">
-                Industries &amp; Companies
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-[#101828]">
+                  Industries &amp; Companies
+                </h3>
+                {errorSteps.includes(2) && (
+                  <span className="text-[11px] font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
+                    Company name required
+                  </span>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => onNavigateStep(2)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-[#5160E7] transition-colors cursor-pointer"
+                className={`flex items-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                  errorSteps.includes(2)
+                    ? "text-red-600 hover:text-red-700"
+                    : "text-gray-600 hover:text-[#5160E7]"
+                }`}
               >
                 <RiPencilLine size={14} />
                 <span>Edit</span>
@@ -152,15 +187,32 @@ export default function StepReviewPublish({
           </div>
 
           {/* 3. Experience Levels Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-3">
+          <div
+            className={`bg-white rounded-2xl border shadow-sm p-6 flex flex-col gap-3 transition-all ${
+              errorSteps.includes(3)
+                ? "border-red-400 ring-2 ring-red-500/10 bg-red-50/10"
+                : "border-gray-100"
+            }`}
+          >
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-[#101828]">
-                Experience Levels
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-[#101828]">
+                  Experience Levels
+                </h3>
+                {errorSteps.includes(3) && (
+                  <span className="text-[11px] font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
+                    At least 1 level required
+                  </span>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => onNavigateStep(3)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-[#5160E7] transition-colors cursor-pointer"
+                className={`flex items-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                  errorSteps.includes(3)
+                    ? "text-red-600 hover:text-red-700"
+                    : "text-gray-600 hover:text-[#5160E7]"
+                }`}
               >
                 <RiPencilLine size={14} />
                 <span>Edit</span>
@@ -172,15 +224,32 @@ export default function StepReviewPublish({
           </div>
 
           {/* 4. Stages & Tasks Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-3">
+          <div
+            className={`bg-white rounded-2xl border shadow-sm p-6 flex flex-col gap-3 transition-all ${
+              errorSteps.includes(4)
+                ? "border-red-400 ring-2 ring-red-500/10 bg-red-50/10"
+                : "border-gray-100"
+            }`}
+          >
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-[#101828]">
-                Stages &amp; Tasks
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-[#101828]">
+                  Stages &amp; Tasks
+                </h3>
+                {errorSteps.includes(4) && (
+                  <span className="text-[11px] font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
+                    At least 1 stage required
+                  </span>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => onNavigateStep(4)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-[#5160E7] transition-colors cursor-pointer"
+                className={`flex items-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                  errorSteps.includes(4)
+                    ? "text-red-600 hover:text-red-700"
+                    : "text-gray-600 hover:text-[#5160E7]"
+                }`}
               >
                 <RiPencilLine size={14} />
                 <span>Edit</span>
@@ -271,13 +340,30 @@ export default function StepReviewPublish({
           </div>
 
           {/* Card 3: Pricing */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-3">
+          <div
+            className={`bg-white rounded-2xl border shadow-sm p-6 flex flex-col gap-3 transition-all ${
+              errorSteps.includes(5)
+                ? "border-red-400 ring-2 ring-red-500/10 bg-red-50/10"
+                : "border-gray-100"
+            }`}
+          >
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-[#101828]">Pricing</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-[#101828]">Pricing</h3>
+                {errorSteps.includes(5) && (
+                  <span className="text-[11px] font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
+                    Price required
+                  </span>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => onNavigateStep(5)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-[#5160E7] transition-colors cursor-pointer"
+                className={`flex items-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                  errorSteps.includes(5)
+                    ? "text-red-600 hover:text-red-700"
+                    : "text-gray-600 hover:text-[#5160E7]"
+                }`}
               >
                 <RiPencilLine size={14} />
                 <span>Edit</span>

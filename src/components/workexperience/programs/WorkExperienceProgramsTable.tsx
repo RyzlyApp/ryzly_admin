@@ -26,6 +26,7 @@ import {
   IWorkExperienceProgram,
   ProgramIconType,
 } from "./types";
+import { fetchSignedUrl } from "@/helper/services/api";
 
 interface WorkExperienceProgramsTableProps {
   programs: IWorkExperienceProgram[];
@@ -52,20 +53,75 @@ export default function WorkExperienceProgramsTable({
 }: WorkExperienceProgramsTableProps) {
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
 
-  const renderProgramIcon = (type: ProgramIconType) => {
-    switch (type) {
-      case "design":
-        return <RiComputerLine size={22} className="text-[#5160E7]" />;
-      case "analytics":
-        return <RiBarChartLine size={22} className="text-[#5160E7]" />;
-      case "marketing":
-        return <RiMegaphoneLine size={22} className="text-[#5160E7]" />;
-      case "management":
-        return <RiBox3Line size={22} className="text-[#5160E7]" />;
-      default:
-        return <RiComputerLine size={22} className="text-[#5160E7]" />;
+const renderProgramIcon = (type: ProgramIconType) => {
+  switch (type) {
+    case "design":
+      return <RiComputerLine size={22} className="text-[#5160E7]" />;
+    case "analytics":
+      return <RiBarChartLine size={22} className="text-[#5160E7]" />;
+    case "marketing":
+      return <RiMegaphoneLine size={22} className="text-[#5160E7]" />;
+    case "management":
+      return <RiBox3Line size={22} className="text-[#5160E7]" />;
+    default:
+      return <RiComputerLine size={22} className="text-[#5160E7]" />;
+  }
+};
+
+function ProgramThumbnail({
+  image,
+  iconType,
+  title,
+}: {
+  image?: string;
+  iconType: ProgramIconType;
+  title: string;
+}) {
+  const [resolvedUrl, setResolvedUrl] = React.useState<string | null>(null);
+  const [hasError, setHasError] = React.useState(false);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    if (!image) {
+      setResolvedUrl(null);
+      return;
     }
-  };
+
+    fetchSignedUrl(image)
+      .then((url) => {
+        if (isMounted && url) {
+          setResolvedUrl(url);
+        }
+      })
+      .catch(() => {
+        if (isMounted) setResolvedUrl(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [image]);
+
+  if (resolvedUrl && !hasError) {
+    return (
+      <div className="w-11 h-11 rounded-xl bg-[#F2F4FF] overflow-hidden shrink-0 border border-gray-100 flex items-center justify-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={resolvedUrl}
+          alt={title}
+          className="w-full h-full object-cover"
+          onError={() => setHasError(true)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-11 h-11 rounded-xl bg-[#F2F4FF] flex items-center justify-center shrink-0">
+      {renderProgramIcon(iconType)}
+    </div>
+  );
+}
 
   return (
     <div className="w-full overflow-x-auto">
@@ -119,9 +175,11 @@ export default function WorkExperienceProgramsTable({
               {/* Programs */}
               <TableCell>
                 <div className="flex items-center gap-3.5">
-                  <div className="w-11 h-11 rounded-xl bg-[#F2F4FF] flex items-center justify-center shrink-0">
-                    {renderProgramIcon(program.iconType)}
-                  </div>
+                  <ProgramThumbnail
+                    image={program.image}
+                    iconType={program.iconType}
+                    title={program.title}
+                  />
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold text-[#101828] leading-tight">
                       {program.title}

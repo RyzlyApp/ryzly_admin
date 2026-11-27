@@ -9,6 +9,7 @@ export interface IWorkExperienceProgram {
   title: string;
   subtitle?: string;
   iconType: ProgramIconType;
+  image?: string;
   industries: string[];
   extraIndustriesCount?: number;
   levels: ProgramLevel[];

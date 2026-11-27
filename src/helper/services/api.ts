@@ -25,4 +25,19 @@ export const fetchSecureData = async <T>(
     // Otherwise, return only the unwrapped data
     return response.data.data;
   }
-}
+};
+
+export const fetchSignedUrl = async (key?: string): Promise<string | null> => {
+  if (!key) return null;
+  if (/^https?:\/\//i.test(key)) return key;
+
+  try {
+    const cleanKey = key.replace(/^\/+/, "");
+    const { data } = await httpService.get(
+      `/upload/signed-url/${encodeURIComponent(cleanKey)}`
+    );
+    return typeof data === "string" ? data : data?.data || data?.url || data;
+  } catch {
+    return null;
+  }
+};

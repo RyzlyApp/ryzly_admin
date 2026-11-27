@@ -126,11 +126,21 @@ export const normalizeWorkExperience = (raw: any, index: number): IWorkExperienc
   // Last Updated
   const lastUpdated = formatDate(raw?.updatedAt || raw?.createdAt);
 
+  // Image extraction (coverImage, company logo, or image)
+  const image =
+    raw?.basicInformation?.coverImage ||
+    raw?.coverImage ||
+    raw?.company?.logo ||
+    raw?.logo ||
+    raw?.image ||
+    "";
+
   return {
     id: String(id),
     title,
     subtitle,
     iconType: inferProgramIcon(title),
+    image: image ? String(image) : undefined,
     industries: displayedIndustries,
     extraIndustriesCount,
     levels,
