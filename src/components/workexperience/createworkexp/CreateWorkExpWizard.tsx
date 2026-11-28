@@ -52,6 +52,9 @@ export default function CreateWorkExpWizard({ experienceId }: CreateWorkExpWizar
     isLoadingTracks,
     isLoadingDraft,
     isSubmitting,
+    errorSteps,
+    returnToReview,
+    setReturnToReview,
   } = useCreateWorkExperience({ initialExperienceId: experienceId });
 
   // Helper delegates to Formik
@@ -143,6 +146,7 @@ export default function CreateWorkExpWizard({ experienceId }: CreateWorkExpWizar
       <CreateWorkExpStepper
         currentStep={currentStep}
         onStepClick={(step) => setCurrentStep(step)}
+        errorSteps={errorSteps}
       />
 
       {/* Dynamic Step View */}
@@ -195,7 +199,10 @@ export default function CreateWorkExpWizard({ experienceId }: CreateWorkExpWizar
         {currentStep === 6 && (
           <StepReviewPublish
             formData={formik.values}
-            onNavigateStep={(step) => setCurrentStep(step)}
+            onNavigateStep={(step) => {
+              setReturnToReview(true);
+              setCurrentStep(step);
+            }}
             onFinalPublish={handleFinalPublish}
             isSuccessOpen={isSuccessModalOpen}
             onSuccessClose={() => {
@@ -205,6 +212,7 @@ export default function CreateWorkExpWizard({ experienceId }: CreateWorkExpWizar
             isSubmitting={isSubmitting}
             tracks={tracks}
             industries={industries}
+            errorSteps={errorSteps}
           />
         )}
       </div>
@@ -216,6 +224,7 @@ export default function CreateWorkExpWizard({ experienceId }: CreateWorkExpWizar
         onNext={handleNext}
         onSaveDraft={handleSaveDraft}
         isLastStep={currentStep === 6}
+        returnToReview={returnToReview}
       />
     </div>
   );

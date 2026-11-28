@@ -8,6 +8,7 @@ interface CreateWorkExpFooterProps {
   onNext: () => void;
   onSaveDraft: () => void;
   isLastStep?: boolean;
+  returnToReview?: boolean;
 }
 
 export default function CreateWorkExpFooter({
@@ -16,6 +17,7 @@ export default function CreateWorkExpFooter({
   onNext,
   onSaveDraft,
   isLastStep = false,
+  returnToReview = false,
 }: CreateWorkExpFooterProps) {
   const getPrevLabel = () => {
     switch (currentStep) {
@@ -66,7 +68,11 @@ export default function CreateWorkExpFooter({
           onClick={onNext}
           className="px-6 py-2.5 rounded-full bg-[#5160E7] text-white text-sm font-medium hover:bg-[#4351d1] transition-all shadow-sm cursor-pointer"
         >
-          {isLastStep ? "Publish" : "Save & Next"}
+          {returnToReview
+            ? "Save & Return to Review"
+            : isLastStep
+            ? "Publish"
+            : "Save & Next"}
         </button>
       </div>
     </div>

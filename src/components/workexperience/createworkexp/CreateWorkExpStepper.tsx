@@ -5,6 +5,7 @@ import { WizardStep } from "./types";
 interface CreateWorkExpStepperProps {
   currentStep: WizardStep;
   onStepClick: (step: WizardStep) => void;
+  errorSteps?: number[];
 }
 
 const STEPS: { step: WizardStep; label: string }[] = [
@@ -19,12 +20,14 @@ const STEPS: { step: WizardStep; label: string }[] = [
 export default function CreateWorkExpStepper({
   currentStep,
   onStepClick,
+  errorSteps = [],
 }: CreateWorkExpStepperProps) {
   return (
     <div className="w-full max-w-4xl mx-auto py-4 px-2">
       <div className="relative flex items-center justify-between">
         {/* Step Items */}
         {STEPS.map((item, index) => {
+          const isError = errorSteps.includes(item.step);
           const isCompleted = item.step < currentStep;
           const isActive = item.step === currentStep;
           const isReached = item.step <= currentStep;
@@ -39,7 +42,9 @@ export default function CreateWorkExpStepper({
               >
                 <div
                   className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-200 ${
-                    isReached
+                    isError
+                      ? "bg-red-500 text-white shadow-sm ring-4 ring-red-500/20 border border-red-500"
+                      : isReached
                       ? "bg-[#5160E7] text-white shadow-sm ring-4 ring-[#5160E7]/10"
                       : "bg-white border-2 border-gray-200 text-gray-400 group-hover:border-gray-300"
                   }`}
@@ -48,7 +53,9 @@ export default function CreateWorkExpStepper({
                 </div>
                 <span
                   className={`mt-2 text-xs text-center font-medium transition-colors whitespace-nowrap ${
-                    isReached
+                    isError
+                      ? "text-red-600 font-semibold"
+                      : isReached
                       ? "text-[#5160E7]"
                       : "text-gray-400 group-hover:text-gray-600"
                   }`}

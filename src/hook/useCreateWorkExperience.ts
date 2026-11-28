@@ -75,6 +75,44 @@ export interface UseCreateWorkExperienceOptions {
   initialExperienceId?: string;
 }
 
+export const validateExperienceSteps = (values: WorkExpFormData): number[] => {
+  const errors: number[] = [];
+
+  // Step 1: Basic Information
+  if (
+    !values.basicInfo?.title?.trim() ||
+    !values.basicInfo?.industry?.trim() ||
+    !values.basicInfo?.description?.trim()
+  ) {
+    errors.push(1);
+  }
+
+  // Step 2: Company
+  if (!values.company?.name?.trim() || !values.company?.description?.trim()) {
+    errors.push(2);
+  }
+
+  // Step 3: Experience Levels
+  if (!values.levels?.beginner?.enabled && !values.levels?.advanced?.enabled) {
+    errors.push(3);
+  }
+
+  // Step 4: Stages
+  if (!Array.isArray(values.stages) || values.stages.length === 0) {
+    errors.push(4);
+  }
+
+  // Step 5: Pricing
+  const rawPrice = parseFloat(
+    String(values.pricing?.usdPrice || "").replace(/[^0-9.]/g, "")
+  );
+  if (isNaN(rawPrice) || rawPrice < 0) {
+    errors.push(5);
+  }
+
+  return errors;
+};
+
 export const useCreateWorkExperience = (options?: UseCreateWorkExperienceOptions) => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -86,6 +124,8 @@ export const useCreateWorkExperience = (options?: UseCreateWorkExperienceOptions
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [errorSteps, setErrorSteps] = useState<number[]>([]);
+  const [returnToReview, setReturnToReview] = useState(false);
 
   useEffect(() => {
     if (initialId) {
@@ -284,6 +324,9 @@ export const useCreateWorkExperience = (options?: UseCreateWorkExperienceOptions
         industry: resolveIndustryId(values.basicInfo.industry),
         description: values.basicInfo.description || "",
         coverImage: values.basicInfo.coverImageUrl || "",
+        whoIsFor: values.basicInfo.whoFor || "",
+        whatTalents: values.basicInfo.whatGains || "",
+        careers: values.basicInfo.careers || "",
       },
       company: {
         name: values.company.name || "",
@@ -597,11 +640,15 @@ export const useCreateWorkExperience = (options?: UseCreateWorkExperienceOptions
             toTextString(existingDraftData.description) ||
             prev.basicInfo.description,
           whoFor:
+            toTextString(basic.whoIsFor) ||
             toTextString(basic.whoFor) ||
+            toTextString(existingDraftData.whoIsFor) ||
             toTextString(existingDraftData.whoFor) ||
             prev.basicInfo.whoFor,
           whatGains:
+            toTextString(basic.whatTalents) ||
             toTextString(basic.whatGains) ||
+            toTextString(existingDraftData.whatTalents) ||
             toTextString(existingDraftData.whatGains) ||
             prev.basicInfo.whatGains,
           careers:
@@ -751,14 +798,25 @@ export const useCreateWorkExperience = (options?: UseCreateWorkExperienceOptions
           // Steps 2-5: Save current step using saveExperienceStep
           await saveStepMutation.mutateAsync({
             id: draftId,
-            step: currentStep,
+            step: Math.min(currentStep, 5),
             payload,
           });
         }
       } catch (err) {
         console.error("Step progression error:", err);
       }
-      setCurrentStep((prev) => (prev + 1) as WizardStep);
+
+      // If returning to review, navigate directly to Step 6 and re-check errors
+      if (returnToReview) {
+        setReturnToReview(false);
+        setErrorSteps((prev) => {
+          const remainingErrors = validateExperienceSteps(formik.values);
+          return remainingErrors;
+        });
+        setCurrentStep(6);
+      } else {
+        setCurrentStep((prev) => (prev + 1) as WizardStep);
+      }
     }
   };
 
@@ -950,6 +1008,20 @@ export const useCreateWorkExperience = (options?: UseCreateWorkExperienceOptions
   };
 
   const handleFinalPublish = async () => {
+    // 1. Run step validation before publishing
+    const validationErrors = validateExperienceSteps(formik.values);
+    if (validationErrors.length > 0) {
+      setErrorSteps(validationErrors);
+      addToast({
+        title: "Incomplete Steps",
+        description: `Please complete all required fields in Step ${validationErrors.join(
+          ", "
+        )} before publishing.`,
+        color: "danger",
+      });
+      return;
+    }
+
     const payload = buildApiPayload(formik.values);
     try {
       let targetId = draftId;
@@ -968,11 +1040,63 @@ export const useCreateWorkExperience = (options?: UseCreateWorkExperienceOptions
       if (targetId) {
         // Direct publish: There is no step 6 endpoint on the backend
         await publishExperienceMutation.mutateAsync(targetId);
+        setErrorSteps([]);
       } else {
-        setIsSuccessModalOpen(true);
+        setErrorSteps([6]);
+        addToast({
+          title: "Publishing Error",
+          description: "Could not create or find experience ID to publish.",
+          color: "danger",
+        });
       }
-    } catch {
-      setIsSuccessModalOpen(true);
+    } catch (err: any) {
+      const errMsg = (
+        err?.response?.data?.message ||
+        err?.message ||
+        ""
+      ).toLowerCase();
+      const detectedErrors: number[] = [];
+      if (
+        errMsg.includes("basic") ||
+        errMsg.includes("type") ||
+        errMsg.includes("industry") ||
+        errMsg.includes("track")
+      ) {
+        detectedErrors.push(1);
+      }
+      if (errMsg.includes("company") || errMsg.includes("logo")) {
+        detectedErrors.push(2);
+      }
+      if (
+        errMsg.includes("level") ||
+        errMsg.includes("beginner") ||
+        errMsg.includes("advanced")
+      ) {
+        detectedErrors.push(3);
+      }
+      if (errMsg.includes("stage") || errMsg.includes("task")) {
+        detectedErrors.push(4);
+      }
+      if (
+        errMsg.includes("price") ||
+        errMsg.includes("pricing") ||
+        errMsg.includes("currency")
+      ) {
+        detectedErrors.push(5);
+      }
+      if (detectedErrors.length === 0) {
+        const stepErrors = validateExperienceSteps(formik.values);
+        detectedErrors.push(...(stepErrors.length > 0 ? stepErrors : [6]));
+      }
+
+      setErrorSteps(detectedErrors);
+      addToast({
+        title: "Publishing Failed",
+        description:
+          err?.response?.data?.message ||
+          "An error occurred while publishing. Please check the highlighted steps.",
+        color: "danger",
+      });
     }
   };
 
@@ -991,6 +1115,10 @@ export const useCreateWorkExperience = (options?: UseCreateWorkExperienceOptions
     draftId,
     isSuccessModalOpen,
     setIsSuccessModalOpen,
+    errorSteps,
+    setErrorSteps,
+    returnToReview,
+    setReturnToReview,
     isUploadingCover,
     isUploadingLogo,
     uploadCoverImage,
